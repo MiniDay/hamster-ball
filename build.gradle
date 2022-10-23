@@ -1,0 +1,70 @@
+plugins {
+    id 'java'
+}
+
+group 'cn.hamster3.mc.plugin'
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
+
+    group = rootProject.group
+    version = rootProject.version
+
+    repositories {
+        maven {
+            url = "https://maven.airgame.net/maven-public/"
+        }
+    }
+
+    configurations {
+        shade
+        api.extendsFrom apiShade
+        implementation.extendsFrom implementationShade
+    }
+
+    dependencies {
+        // https://mvnrepository.com/artifact/org.projectlombok/lombok
+        compileOnly 'org.projectlombok:lombok:1.18.24'
+        annotationProcessor 'org.projectlombok:lombok:1.18.24'
+        // https://mvnrepository.com/artifact/org.jetbrains/annotations
+        compileOnly 'org.jetbrains:annotations:23.0.0'
+    }
+
+    tasks.withType(JavaCompile) {
+        options.setEncoding("UTF-8")
+    }
+
+    tasks.withType(Jar) {
+        from([rootProject.file("LICENSE")])
+        duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    }
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+//        withJavadocJar()
+        withSourcesJar()
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from getProject().getComponents().java
+            }
+        }
+        repositories {
+            maven {
+                def releasesRepoUrl = 'https://maven.airgame.net/maven-releases/'
+                def snapshotsRepoUrl = 'https://maven.airgame.net/maven-snapshots/'
+
+                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+                credentials {
+                    username rootProject.getProperties().getOrDefault("maven_username", "")
+                    password rootProject.getProperties().getOrDefault("maven_password", "")
+                }
+            }
+        }
+    }
+}

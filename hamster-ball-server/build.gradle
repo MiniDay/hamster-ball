@@ -1,0 +1,56 @@
+version = '1.0.0'
+setArchivesBaseName("HamsterBall-Server")
+
+evaluationDependsOn(':hamster-ball-common')
+
+dependencies {
+    apiShade(project(":hamster-ball-common")) {
+        exclude group: "*"
+    }
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    implementation 'org.slf4j:slf4j-api:2.0.3'
+
+    // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
+    shade 'org.apache.logging.log4j:log4j-core:2.19.0'
+    // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
+    shade 'org.apache.logging.log4j:log4j-slf4j-impl:2.19.0'
+
+    // https://mvnrepository.com/artifact/io.netty/netty-all
+    implementationShade 'io.netty:netty-all:4.1.84.Final'
+    // https://mvnrepository.com/artifact/org.yaml/snakeyaml
+    implementationShade 'org.yaml:snakeyaml:1.33'
+    // https://mvnrepository.com/artifact/com.google.code.gson/gson
+    implementation 'com.google.code.gson:gson:2.9.1'
+
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+tasks.compileJava.dependsOn(":hamster-ball-common:build")
+tasks.create("shadowJar", Jar) {
+    dependsOn("jar")
+    manifest.attributes('Main-Class': 'cn.hamster3.mc.plugin.ball.server.Bootstrap')
+    manifest.attributes('ball-version': project.version)
+    from([
+            tasks.jar.outputs.files.collect {
+                it.isDirectory() ? it : zipTree(it)
+            },
+            configurations.shade.collect {
+                it.isDirectory() ? it : zipTree(it)
+            },
+            configurations.apiShade.collect {
+                it.isDirectory() ? it : zipTree(it)
+            },
+            configurations.implementationShade.collect {
+                it.isDirectory() ? it : zipTree(it)
+            }
+    ])
+    destinationDir(rootProject.buildDir)
+}
+tasks.build.dependsOn(shadowJar)

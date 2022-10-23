@@ -1,0 +1,10 @@
+ball-server:
+  host: "ball.hamster3.cn"
+  port: 58888
+  nio-thread: 10
+
+server-info:
+  # 服务器唯一识别码，最长 32 字符
+  id: "BungeeCord"
+  # 服务端名称，用于展示给玩家看
+  name: "代理端"

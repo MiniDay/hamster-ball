@@ -1,0 +1,24 @@
+ball-server:
+  host: "ball.hamster3.cn"
+  port: 58888
+  nio-thread: 10
+
+server-info:
+  # 服务器唯一识别码，最长 32 字符
+  # 推荐格式：全小写英文+横杠+数字尾号
+  # 例如：
+  #   survival-1, survival-2（生存1区，生存2区）
+  #   plot-1, plot-2（地皮1区，地皮2区）
+  #   resource-1, resource-2（资源1区，资源2区）
+  id: "test-1"
+  # 服务端名称，用于展示给玩家看
+  name: "测试1区"
+  # 当前子服的内网地址
+  # 不填则自动获取 server.properties 文件中的设置
+  # 若都为空，则自动设定为 127.0.0.1
+  # 连接上 HamsterBall 之后，BC 端的插件会自动将这个服务器的地址和端口加入到列表
+  # 因此只需在这里填上无需每次都手动更改 BC 的配置文件
+  # host: "127.0.0.1"
+  # 当前子服的内网端口
+  # 不填则自动获取 server.properties 文件中的设置
+  # port: 25577

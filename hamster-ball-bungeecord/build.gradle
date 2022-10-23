@@ -1,0 +1,42 @@
+version = '1.0.0'
+setArchivesBaseName("HamsterBall-BungeeCord")
+
+evaluationDependsOn(':hamster-ball-common')
+
+dependencies {
+    apiShade(project(":hamster-ball-common")) {
+        exclude group: "*"
+    }
+
+    compileOnly 'net.md-5:bungeecord-api:1.17-R0.1-SNAPSHOT'
+    compileOnly "cn.hamster3.mc.plugin:hamster-core-bungeecord:1.0.0"
+}
+
+processResources {
+    inputs.property "version", project.version
+    filesMatching("plugin.yml") {
+        expand "version": project.version
+    }
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+}
+
+tasks.compileJava.dependsOn(":hamster-ball-common:build")
+tasks.create("shadowJar", Jar) {
+    dependsOn("jar")
+    from([
+            tasks.jar.outputs.files.collect {
+                it.isDirectory() ? it : zipTree(it)
+            },
+            configurations.shade.collect {
+                it.isDirectory() ? it : zipTree(it)
+            },
+            configurations.apiShade.collect {
+                it.isDirectory() ? it : zipTree(it)
+            },
+            configurations.implementationShade.collect {
+                it.isDirectory() ? it : zipTree(it)
+            }
+    ])
+    destinationDir(rootProject.buildDir)
+}
+tasks.build.dependsOn(shadowJar)

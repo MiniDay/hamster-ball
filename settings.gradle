@@ -1,0 +1,6 @@
+rootProject.name = 'hamster-ball'
+include 'hamster-ball-common'
+include 'hamster-ball-bukkit'
+include 'hamster-ball-bungeecord'
+include 'hamster-ball-server'
+
