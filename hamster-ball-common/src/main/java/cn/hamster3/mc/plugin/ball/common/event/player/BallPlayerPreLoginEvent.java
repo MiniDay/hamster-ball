@@ -5,7 +5,7 @@ import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * 玩家准备连接到服务器
+ * 玩家准备连接到代理服务器
  */
 @Data
 @AllArgsConstructor

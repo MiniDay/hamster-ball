@@ -109,33 +109,11 @@ public class BallChannelInboundHandler extends SimpleChannelInboundHandler<Strin
                 }
                 break;
             }
-            case BallPlayerChatEvent.ACTION: {
-                BallPlayerChatEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), BallPlayerChatEvent.class);
+            case BallPlayerPreLoginEvent.ACTION: {
+                BallPlayerPreLoginEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), BallPlayerPreLoginEvent.class);
                 for (BallListener listener : BallAPI.getInstance().getListeners()) {
                     try {
-                        listener.onPlayerChat(event);
-                    } catch (Exception | Error e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-            }
-            case BallPlayerConnectServerEvent.ACTION: {
-                BallPlayerConnectServerEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), BallPlayerConnectServerEvent.class);
-                for (BallListener listener : BallAPI.getInstance().getListeners()) {
-                    try {
-                        listener.onBallPlayerConnectServer(event);
-                    } catch (Exception | Error e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-            }
-            case BallPlayerLogoutEvent.ACTION: {
-                BallPlayerLogoutEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), BallPlayerLogoutEvent.class);
-                for (BallListener listener : BallAPI.getInstance().getListeners()) {
-                    try {
-                        listener.onBallPlayerLogout(event);
+                        listener.onBallPlayerPreLogin(event);
                     } catch (Exception | Error e) {
                         e.printStackTrace();
                     }
@@ -147,17 +125,6 @@ public class BallChannelInboundHandler extends SimpleChannelInboundHandler<Strin
                 for (BallListener listener : BallAPI.getInstance().getListeners()) {
                     try {
                         listener.onBallPlayerLogin(event);
-                    } catch (Exception | Error e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-            }
-            case BallPlayerPostConnectServerEvent.ACTION: {
-                BallPlayerPostConnectServerEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), BallPlayerPostConnectServerEvent.class);
-                for (BallListener listener : BallAPI.getInstance().getListeners()) {
-                    try {
-                        listener.onBallPlayerPostConnectServer(event);
                     } catch (Exception | Error e) {
                         e.printStackTrace();
                     }
@@ -186,11 +153,44 @@ public class BallChannelInboundHandler extends SimpleChannelInboundHandler<Strin
                 }
                 break;
             }
-            case BallPlayerPreLoginEvent.ACTION: {
-                BallPlayerPreLoginEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), BallPlayerPreLoginEvent.class);
+            case BallPlayerConnectServerEvent.ACTION: {
+                BallPlayerConnectServerEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), BallPlayerConnectServerEvent.class);
                 for (BallListener listener : BallAPI.getInstance().getListeners()) {
                     try {
-                        listener.onBallPlayerPreLogin(event);
+                        listener.onBallPlayerConnectServer(event);
+                    } catch (Exception | Error e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            }
+            case BallPlayerPostConnectServerEvent.ACTION: {
+                BallPlayerPostConnectServerEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), BallPlayerPostConnectServerEvent.class);
+                for (BallListener listener : BallAPI.getInstance().getListeners()) {
+                    try {
+                        listener.onBallPlayerPostConnectServer(event);
+                    } catch (Exception | Error e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            }
+            case BallPlayerLogoutEvent.ACTION: {
+                BallPlayerLogoutEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), BallPlayerLogoutEvent.class);
+                for (BallListener listener : BallAPI.getInstance().getListeners()) {
+                    try {
+                        listener.onBallPlayerLogout(event);
+                    } catch (Exception | Error e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            }
+            case BallPlayerChatEvent.ACTION: {
+                BallPlayerChatEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), BallPlayerChatEvent.class);
+                for (BallListener listener : BallAPI.getInstance().getListeners()) {
+                    try {
+                        listener.onBallPlayerChat(event);
                     } catch (Exception | Error e) {
                         e.printStackTrace();
                     }

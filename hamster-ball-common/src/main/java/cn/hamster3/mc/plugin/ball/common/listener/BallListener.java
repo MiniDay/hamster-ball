@@ -10,13 +10,11 @@ import org.jetbrains.annotations.NotNull;
 public abstract class BallListener {
     /**
      * 该监听器的执行优先级
-     * <p>
-     * 数字越低越先执行
      *
      * @return 优先级
      */
-    public int getPriority() {
-        return 100;
+    public ListenerPriority getPriority() {
+        return ListenerPriority.NORMAL;
     }
 
     public void onBroadcastPlayerMessage(@NotNull BroadcastPlayerMessageEvent event) {
@@ -61,7 +59,7 @@ public abstract class BallListener {
     public void onBallPlayerLogout(@NotNull BallPlayerLogoutEvent event) {
     }
 
-    public void onPlayerChat(@NotNull BallPlayerChatEvent event) {
+    public void onBallPlayerChat(@NotNull BallPlayerChatEvent event) {
     }
 
     public void onServerOffline(@NotNull ServerOfflineEvent event) {
@@ -70,10 +68,10 @@ public abstract class BallListener {
     public void onServerOnline(@NotNull ServerOnlineEvent event) {
     }
 
-    public void onMessageReceived(@NotNull MessageInfo event) {
+    public void onMessageSend(@NotNull MessageInfo event) {
     }
 
-    public void onMessageSend(@NotNull MessageInfo event) {
+    public void onMessageReceived(@NotNull MessageInfo event) {
     }
 
     public void onConnectInactive() {

@@ -8,6 +8,8 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * 玩家准备进入子服
+ * <p>
+ * 仅在使用 velocity 代理端时才会触发这个事件
  */
 @Data
 @AllArgsConstructor

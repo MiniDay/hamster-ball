@@ -13,6 +13,7 @@ import cn.hamster3.mc.plugin.ball.common.event.player.*;
 import cn.hamster3.mc.plugin.ball.common.event.server.ServerOfflineEvent;
 import cn.hamster3.mc.plugin.ball.common.event.server.ServerOnlineEvent;
 import cn.hamster3.mc.plugin.ball.common.listener.BallListener;
+import cn.hamster3.mc.plugin.ball.common.listener.ListenerPriority;
 import cn.hamster3.mc.plugin.core.common.api.CoreAPI;
 import cn.hamster3.mc.plugin.core.common.constant.CoreConstantObjects;
 import cn.hamster3.mc.plugin.core.common.data.Message;
@@ -75,8 +76,8 @@ public abstract class BallAPI {
 
         addListener(new BallListener() {
             @Override
-            public int getPriority() {
-                return 0;
+            public ListenerPriority getPriority() {
+                return ListenerPriority.LOW;
             }
 
             @Override
@@ -431,9 +432,9 @@ public abstract class BallAPI {
     /**
      * 给玩家发送一条消息
      *
-     * @param receiver    玩家
-     * @param message 消息
-     * @param cache   当玩家不在线时，是否缓存消息等待玩家上线再发送
+     * @param receiver 玩家
+     * @param message  消息
+     * @param cache    当玩家不在线时，是否缓存消息等待玩家上线再发送
      */
     public void sendMessageToPlayer(@NotNull Set<UUID> receiver, @NotNull Message message, boolean cache) {
         for (UUID uuid : receiver) {
@@ -662,7 +663,7 @@ public abstract class BallAPI {
 
     public void addListener(@NotNull BallListener listener) {
         listeners.add(listener);
-        listeners.sort(Comparator.comparingInt(BallListener::getPriority));
+        listeners.sort(Comparator.comparing(BallListener::getPriority));
     }
 
     public void removeListener(@NotNull BallListener listener) {

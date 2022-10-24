@@ -13,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
@@ -84,7 +85,7 @@ public class BallBukkitListener extends BallListener implements Listener {
         Bukkit.shutdown();
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
         Location location = playerToLocation.remove(player.getUniqueId());
@@ -93,7 +94,7 @@ public class BallBukkitListener extends BallListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
 
     }
