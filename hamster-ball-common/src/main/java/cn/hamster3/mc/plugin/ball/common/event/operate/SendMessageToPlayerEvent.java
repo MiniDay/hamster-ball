@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -13,7 +14,7 @@ public class SendMessageToPlayerEvent {
     public static final String ACTION = "SendMessageToPlayer";
 
     @NotNull
-    private final UUID uuid;
+    private final Set<UUID> receiver;
     @NotNull
     private final Message message;
 }

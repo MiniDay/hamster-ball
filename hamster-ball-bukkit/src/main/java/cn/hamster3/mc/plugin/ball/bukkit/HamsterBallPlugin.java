@@ -1,6 +1,7 @@
 package cn.hamster3.mc.plugin.ball.bukkit;
 
 import cn.hamster3.mc.plugin.ball.bukkit.api.BallBukkitAPI;
+import cn.hamster3.mc.plugin.ball.bukkit.listener.BallBukkitListener;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -29,6 +30,14 @@ public class HamsterBallPlugin extends JavaPlugin {
             e.printStackTrace();
             sync(Bukkit::shutdown);
         }
+    }
+
+    @Override
+    public void onEnable() {
+        Logger logger = getLogger();
+        Bukkit.getPluginManager().registerEvents(BallBukkitListener.INSTANCE, this);
+        logger.info("已注册 BallBukkitListener.");
+        logger.info("HamsterBall 已启动.");
     }
 
     @Override

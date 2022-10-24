@@ -1,6 +1,6 @@
 package cn.hamster3.mc.plugin.ball.common.listener;
 
-import cn.hamster3.mc.plugin.ball.common.data.ServiceMessageInfo;
+import cn.hamster3.mc.plugin.ball.common.data.MessageInfo;
 import cn.hamster3.mc.plugin.ball.common.event.operate.*;
 import cn.hamster3.mc.plugin.ball.common.event.player.*;
 import cn.hamster3.mc.plugin.ball.common.event.server.ServerOfflineEvent;
@@ -25,7 +25,7 @@ public abstract class BallListener {
     public void onDispatchConsoleCommand(@NotNull DispatchConsoleCommandEvent event) {
     }
 
-    public void onDispatchGamePlayerCommand(@NotNull DispatchPlayerCommandEvent event) {
+    public void onDispatchPlayerCommand(@NotNull DispatchPlayerCommandEvent event) {
     }
 
     public void onKickPlayer(@NotNull KickPlayerEvent event) {
@@ -40,28 +40,28 @@ public abstract class BallListener {
     public void onSendPlayerToPlayer(@NotNull SendPlayerToPlayerEvent event) {
     }
 
-    public void onPlayerChat(@NotNull PlayerChatEvent event) {
+    public void onBallPlayerPreLogin(@NotNull BallPlayerPreLoginEvent event) {
     }
 
-    public void onPlayerConnectServer(@NotNull PlayerConnectServerEvent event) {
+    public void onBallPlayerLogin(@NotNull BallPlayerLoginEvent event) {
     }
 
-    public void onPlayerDisconnect(@NotNull PlayerDisconnectEvent event) {
+    public void onBallPlayerPostLogin(@NotNull BallPlayerPostLoginEvent event) {
     }
 
-    public void onPlayerLogin(@NotNull PlayerLoginEvent event) {
+    public void onBallPlayerPreConnectServer(@NotNull BallPlayerPreConnectServerEvent event) {
     }
 
-    public void onPlayerPostConnectServer(@NotNull PlayerPostConnectServerEvent event) {
+    public void onBallPlayerConnectServer(@NotNull BallPlayerConnectServerEvent event) {
     }
 
-    public void onPlayerPostLogin(@NotNull PlayerPostLoginEvent event) {
+    public void onBallPlayerPostConnectServer(@NotNull BallPlayerPostConnectServerEvent event) {
     }
 
-    public void onPlayerPreConnectServer(@NotNull PlayerPreConnectServerEvent event) {
+    public void onBallPlayerLogout(@NotNull BallPlayerLogoutEvent event) {
     }
 
-    public void onPlayerPreLogin(@NotNull PlayerPreLoginEvent event) {
+    public void onPlayerChat(@NotNull BallPlayerChatEvent event) {
     }
 
     public void onServerOffline(@NotNull ServerOfflineEvent event) {
@@ -70,10 +70,10 @@ public abstract class BallListener {
     public void onServerOnline(@NotNull ServerOnlineEvent event) {
     }
 
-    public void onMessageReceived(@NotNull ServiceMessageInfo event) {
+    public void onMessageReceived(@NotNull MessageInfo event) {
     }
 
-    public void onMessageSend(@NotNull ServiceMessageInfo event) {
+    public void onMessageSend(@NotNull MessageInfo event) {
     }
 
     public void onConnectInactive() {

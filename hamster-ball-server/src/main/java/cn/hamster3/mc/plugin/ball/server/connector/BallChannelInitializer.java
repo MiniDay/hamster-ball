@@ -1,6 +1,6 @@
 package cn.hamster3.mc.plugin.ball.server.connector;
 
-import cn.hamster3.mc.plugin.ball.common.data.ServiceMessageInfo;
+import cn.hamster3.mc.plugin.ball.common.data.MessageInfo;
 import cn.hamster3.mc.plugin.ball.server.config.ServerConfig;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -26,7 +26,7 @@ public class BallChannelInitializer extends ChannelInitializer<NioSocketChannel>
     private BallChannelInitializer() {
     }
 
-    public static void broadcastMessage(ServiceMessageInfo messageInfo) {
+    public static void broadcastMessage(MessageInfo messageInfo) {
         String string = messageInfo.toString();
         for (Channel channel : CHANNELS) {
             channel.writeAndFlush(string);

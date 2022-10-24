@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.jetbrains.annotations.NotNull;
@@ -38,14 +39,21 @@ public class BallBukkitListener extends BallListener implements Listener {
     }
 
     @Override
-    public void onDispatchGamePlayerCommand(@NotNull DispatchPlayerCommandEvent event) {
+    public void onDispatchPlayerCommand(@NotNull DispatchPlayerCommandEvent event) {
         if (event.getType() != null && event.getType() != ServerType.GAME) {
             return;
         }
-        if (event.getUuid() != null && Bukkit.getPlayer(event.getUuid()) == null) {
+        if (event.getUuid() != null) {
+            Player player = Bukkit.getPlayer(event.getUuid());
+            if (player == null) {
+                return;
+            }
+            Bukkit.dispatchCommand(player, event.getCommand());
             return;
         }
-        Bukkit.dispatchCommand(Bukkit.getPlayer(event.getUuid()), event.getCommand());
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            Bukkit.dispatchCommand(player, event.getCommand());
+        }
     }
 
     @Override
@@ -83,5 +91,10 @@ public class BallBukkitListener extends BallListener implements Listener {
         if (location != null) {
             player.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
         }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
+
     }
 }

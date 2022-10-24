@@ -6,12 +6,12 @@ import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * 玩家已连接到服务器
+ * 玩家已进入子服
  */
 @Data
 @AllArgsConstructor
-public class PlayerPostLoginEvent {
-    public static final String ACTION = "PlayerPostLogin";
+public class BallPlayerPostConnectServerEvent {
+    public static final String ACTION = "PlayerPostConnectServer";
 
     @NotNull
     private final PlayerInfo playerInfo;

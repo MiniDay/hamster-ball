@@ -6,11 +6,11 @@ import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * 玩家连接到服务器
+ * 玩家连接到代理服务器
  */
 @Data
 @AllArgsConstructor
-public class PlayerLoginEvent {
+public class BallPlayerLoginEvent {
     public static final String ACTION = "PlayerLogin";
 
     @NotNull

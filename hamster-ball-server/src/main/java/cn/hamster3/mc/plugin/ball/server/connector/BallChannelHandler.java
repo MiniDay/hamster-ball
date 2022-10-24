@@ -1,8 +1,7 @@
 package cn.hamster3.mc.plugin.ball.server.connector;
 
-import cn.hamster3.mc.plugin.ball.common.data.ServiceMessageInfo;
+import cn.hamster3.mc.plugin.ball.common.data.MessageInfo;
 import cn.hamster3.mc.plugin.ball.server.constant.ConstantObjects;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
@@ -18,7 +17,7 @@ public class BallChannelHandler extends SimpleChannelInboundHandler<String> {
     @Override
     protected void channelRead0(ChannelHandlerContext context, String message) {
         try {
-            ServiceMessageInfo messageInfo = ConstantObjects.GSON.fromJson(message, ServiceMessageInfo.class);
+            MessageInfo messageInfo = ConstantObjects.GSON.fromJson(message, MessageInfo.class);
             LOGGER.info("从服务器 {} 上收到一条消息: \n {}", messageInfo.getSenderID(), messageInfo);
             BallChannelInitializer.broadcastMessage(messageInfo);
         } catch (Exception e) {

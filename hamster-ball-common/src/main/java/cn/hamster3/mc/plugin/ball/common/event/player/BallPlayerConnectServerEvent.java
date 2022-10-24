@@ -7,12 +7,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * 玩家准备进入子服
+ * 玩家进入子服
  */
 @Data
 @AllArgsConstructor
-public class PlayerPreConnectServerEvent {
-    public static final String ACTION = "PlayerPreConnectServer";
+public class BallPlayerConnectServerEvent {
+    public static final String ACTION = "PlayerConnectServer";
 
     @NotNull
     private final PlayerInfo playerInfo;
@@ -20,5 +20,4 @@ public class PlayerPreConnectServerEvent {
     private final String from;
     @NotNull
     private final String to;
-
 }

@@ -22,7 +22,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuppressWarnings("unused")
-public class ServiceMessageInfo {
+public class MessageInfo {
     /**
      * 消息的频道
      */

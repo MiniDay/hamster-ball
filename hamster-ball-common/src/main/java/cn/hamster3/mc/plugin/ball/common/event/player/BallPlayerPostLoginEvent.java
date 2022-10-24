@@ -4,20 +4,15 @@ import cn.hamster3.mc.plugin.ball.common.entity.PlayerInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
- * 玩家进入子服
+ * 玩家已连接到代理服务器
  */
 @Data
 @AllArgsConstructor
-public class PlayerConnectServerEvent {
-    public static final String ACTION = "PlayerConnectServer";
+public class BallPlayerPostLoginEvent {
+    public static final String ACTION = "PlayerPostLogin";
 
     @NotNull
     private final PlayerInfo playerInfo;
-    @Nullable
-    private final String from;
-    @NotNull
-    private final String to;
 }

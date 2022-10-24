@@ -3,8 +3,8 @@ package cn.hamster3.mc.plugin.ball.common.api;
 import cn.hamster3.mc.plugin.ball.common.config.BallConfig;
 import cn.hamster3.mc.plugin.ball.common.connector.BallChannelInitializer;
 import cn.hamster3.mc.plugin.ball.common.constant.BallCommonConstants;
+import cn.hamster3.mc.plugin.ball.common.data.MessageInfo;
 import cn.hamster3.mc.plugin.ball.common.data.ServiceLocation;
-import cn.hamster3.mc.plugin.ball.common.data.ServiceMessageInfo;
 import cn.hamster3.mc.plugin.ball.common.entity.PlayerInfo;
 import cn.hamster3.mc.plugin.ball.common.entity.ServerInfo;
 import cn.hamster3.mc.plugin.ball.common.entity.ServerType;
@@ -80,37 +80,37 @@ public abstract class BallAPI {
             }
 
             @Override
-            public void onPlayerConnectServer(@NotNull PlayerConnectServerEvent event) {
+            public void onBallPlayerConnectServer(@NotNull BallPlayerConnectServerEvent event) {
                 PlayerInfo info = event.getPlayerInfo();
                 playerInfo.put(info.getUuid(), info);
             }
 
             @Override
-            public void onPlayerDisconnect(@NotNull PlayerDisconnectEvent event) {
-                PlayerInfo info = playerInfo.get(event.getPlayerUUID());
-                info.setOnline(false);
-            }
-
-            @Override
-            public void onPlayerLogin(@NotNull PlayerLoginEvent event) {
+            public void onBallPlayerLogout(@NotNull BallPlayerLogoutEvent event) {
                 PlayerInfo info = event.getPlayerInfo();
                 playerInfo.put(info.getUuid(), info);
             }
 
             @Override
-            public void onPlayerPostConnectServer(@NotNull PlayerPostConnectServerEvent event) {
+            public void onBallPlayerLogin(@NotNull BallPlayerLoginEvent event) {
                 PlayerInfo info = event.getPlayerInfo();
                 playerInfo.put(info.getUuid(), info);
             }
 
             @Override
-            public void onPlayerPostLogin(@NotNull PlayerPostLoginEvent event) {
+            public void onBallPlayerPostConnectServer(@NotNull BallPlayerPostConnectServerEvent event) {
                 PlayerInfo info = event.getPlayerInfo();
                 playerInfo.put(info.getUuid(), info);
             }
 
             @Override
-            public void onPlayerPreConnectServer(@NotNull PlayerPreConnectServerEvent event) {
+            public void onBallPlayerPostLogin(@NotNull BallPlayerPostLoginEvent event) {
+                PlayerInfo info = event.getPlayerInfo();
+                playerInfo.put(info.getUuid(), info);
+            }
+
+            @Override
+            public void onBallPlayerPreConnectServer(@NotNull BallPlayerPreConnectServerEvent event) {
                 PlayerInfo info = event.getPlayerInfo();
                 playerInfo.put(info.getUuid(), info);
             }
@@ -159,7 +159,6 @@ public abstract class BallAPI {
                 statement.execute("CREATE TABLE IF NOT EXISTS " + BallCommonConstants.SQL.PLAYER_INFO_TABLE + "(" +
                         "`uuid` CHAR(36) PRIMARY KEY," +
                         "`name` VARCHAR(16) NOT NULL," +
-                        "`profile` TEXT NOT NULL," +
                         "`game_server` VARCHAR(32) NOT NULL," +
                         "`proxy_server` VARCHAR(32) NOT NULL," +
                         "`online` BOOLEAN NOT NULL" +
@@ -213,7 +212,6 @@ public abstract class BallAPI {
                     UUID uuid = UUID.fromString(set.getString("uuid"));
                     playerInfo.put(uuid, new PlayerInfo(uuid,
                             set.getString("name"),
-                            CoreConstantObjects.JSON_PARSER.parse(set.getString("profile")).getAsJsonObject(),
                             set.getString("game_server"),
                             set.getString("proxy_server"),
                             set.getBoolean("online")
@@ -225,7 +223,7 @@ public abstract class BallAPI {
 
         }
 
-        sendMessagingMessage(
+        sendBallMessage(
                 BALL_CHANNEL,
                 ServerOnlineEvent.ACTION,
                 new ServerOnlineEvent(localInfo)
@@ -277,7 +275,7 @@ public abstract class BallAPI {
         }
         enable = false;
 
-        sendMessagingMessage(
+        sendBallMessage(
                 BALL_CHANNEL,
                 ServerOfflineEvent.ACTION,
                 new ServerOfflineEvent(getLocalServerId())
@@ -329,7 +327,7 @@ public abstract class BallAPI {
      * @param message 消息
      */
     public void broadcastPlayerMessage(@NotNull Message message) {
-        sendMessagingMessage(
+        sendBallMessage(
                 BALL_CHANNEL,
                 ServerType.PROXY,
                 BroadcastPlayerMessageEvent.ACTION,
@@ -345,7 +343,7 @@ public abstract class BallAPI {
      * @param command  命令内容
      */
     public void dispatchConsoleCommand(@Nullable ServerType type, @Nullable String serverID, @NotNull String command) {
-        sendMessagingMessage(
+        sendBallMessage(
                 BALL_CHANNEL,
                 ServerType.GAME,
                 DispatchConsoleCommandEvent.ACTION,
@@ -362,7 +360,7 @@ public abstract class BallAPI {
      * @param command 命令内容
      */
     public void dispatchPlayerCommand(@Nullable ServerType type, @Nullable UUID uuid, @NotNull String command) {
-        sendMessagingMessage(
+        sendBallMessage(
                 BALL_CHANNEL,
                 ServerType.GAME,
                 DispatchPlayerCommandEvent.ACTION,
@@ -388,33 +386,13 @@ public abstract class BallAPI {
      * @param reason 原因
      */
     public void kickPlayer(@NotNull UUID uuid, @NotNull Component reason) {
-        sendMessagingMessage(
+        sendBallMessage(
                 BALL_CHANNEL,
                 ServerType.PROXY,
                 KickPlayerEvent.ACTION,
                 new KickPlayerEvent(uuid, reason)
 
         );
-    }
-
-    /**
-     * 给玩家发送一条消息
-     *
-     * @param uuid    玩家
-     * @param message 消息
-     */
-    public void sendMessageToPlayer(@NotNull UUID uuid, @NotNull String message) {
-        sendMessageToPlayer(uuid, new Message().message(message), false);
-    }
-
-    /**
-     * 给玩家发送一条消息
-     *
-     * @param uuid    玩家
-     * @param message 消息
-     */
-    public void sendMessageToPlayer(@NotNull UUID uuid, @NotNull Component message) {
-        sendMessageToPlayer(uuid, new Message().message(message), false);
     }
 
     /**
@@ -441,32 +419,49 @@ public abstract class BallAPI {
             }
             return;
         }
-        sendMessagingMessage(
+        sendBallMessage(
                 BALL_CHANNEL,
                 ServerType.PROXY,
                 SendMessageToPlayerEvent.ACTION,
-                new SendMessageToPlayerEvent(uuid, message)
+                new SendMessageToPlayerEvent(Collections.singleton(uuid), message)
 
         );
     }
 
     /**
-     * 把玩家传送到一个位置
-     * <p>
-     * 如果目标位置不在当前服务器
-     * <p>
-     * 则会先尝试将玩家连接至目标服务器再进行传送
+     * 给玩家发送一条消息
      *
-     * @param sendPlayerUUID 玩家的uuid
-     * @param location       坐标
+     * @param receiver    玩家
+     * @param message 消息
+     * @param cache   当玩家不在线时，是否缓存消息等待玩家上线再发送
      */
-    public void sendPlayerToLocation(@NotNull UUID sendPlayerUUID, @NotNull ServiceLocation location) {
-        sendMessagingMessage(
+    public void sendMessageToPlayer(@NotNull Set<UUID> receiver, @NotNull Message message, boolean cache) {
+        for (UUID uuid : receiver) {
+            PlayerInfo info = getPlayerInfo(uuid);
+            if (info == null || !info.isOnline()) {
+                if (!cache) {
+                    return;
+                }
+                try (Connection connection = CoreAPI.getInstance().getConnection()) {
+                    PreparedStatement statement = connection.prepareStatement("INSERT INTO " + BallCommonConstants.SQL.CACHED_MESSAGE_TABLE + " VALUES(?, ?);");
+                    statement.setString(1, uuid.toString());
+                    statement.setString(2, message.saveToJson().toString());
+                    statement.executeUpdate();
+                    statement.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return;
+            }
+        }
+        sendBallMessage(
                 BALL_CHANNEL,
-                SendPlayerToLocationEvent.ACTION,
-                new SendPlayerToLocationEvent(Collections.singleton(sendPlayerUUID), location, null)
+                ServerType.PROXY,
+                SendMessageToPlayerEvent.ACTION,
+                new SendMessageToPlayerEvent(receiver, message)
         );
     }
+
 
     /**
      * 把玩家传送到一个位置
@@ -480,7 +475,7 @@ public abstract class BallAPI {
      * @param doneMessage    传送完成后显示的消息
      */
     public void sendPlayerToLocation(@NotNull UUID sendPlayerUUID, @NotNull ServiceLocation location, @Nullable Message doneMessage) {
-        sendMessagingMessage(
+        sendBallMessage(
                 BALL_CHANNEL,
                 SendPlayerToLocationEvent.ACTION,
                 new SendPlayerToLocationEvent(Collections.singleton(sendPlayerUUID), location, doneMessage)
@@ -494,33 +489,15 @@ public abstract class BallAPI {
      * <p>
      * 则会先尝试将玩家连接至目标服务器再进行传送
      *
-     * @param uuidSet  玩家的uuid
-     * @param location 坐标
+     * @param sendPlayerUUID 玩家的uuid
+     * @param location       坐标
+     * @param doneMessage    传送完成后显示的消息
      */
-    public void sendPlayerToLocation(@NotNull HashSet<UUID> uuidSet, @NotNull ServiceLocation location) {
-        sendMessagingMessage(
+    public void sendPlayerToLocation(@NotNull HashSet<UUID> sendPlayerUUID, @NotNull ServiceLocation location, @Nullable Message doneMessage) {
+        sendBallMessage(
                 BALL_CHANNEL,
                 SendPlayerToLocationEvent.ACTION,
-                new SendPlayerToLocationEvent(uuidSet, location, null)
-        );
-    }
-
-    /**
-     * 把玩家传送到一个位置
-     * <p>
-     * 如果目标位置不在当前服务器
-     * <p>
-     * 则会先尝试将玩家连接至目标服务器再进行传送
-     *
-     * @param uuidSet     玩家的uuid
-     * @param location    坐标
-     * @param doneMessage 传送完成后显示的消息
-     */
-    public void sendPlayerToLocation(@NotNull HashSet<UUID> uuidSet, @NotNull ServiceLocation location, @Nullable Message doneMessage) {
-        sendMessagingMessage(
-                BALL_CHANNEL,
-                SendPlayerToLocationEvent.ACTION,
-                new SendPlayerToLocationEvent(uuidSet, location, doneMessage)
+                new SendPlayerToLocationEvent(sendPlayerUUID, location, doneMessage)
         );
     }
 
@@ -532,11 +509,11 @@ public abstract class BallAPI {
      * @param sendPlayerUUID 被传送的玩家
      * @param toPlayerUUID   传送的目标玩家
      */
-    public void sendPlayerToPlayer(@NotNull UUID sendPlayerUUID, @NotNull UUID toPlayerUUID) {
-        sendMessagingMessage(
+    public void sendPlayerToPlayer(@NotNull UUID sendPlayerUUID, @NotNull UUID toPlayerUUID, @Nullable Message doneMessage, @Nullable Message doneTargetMessage) {
+        sendBallMessage(
                 BALL_CHANNEL,
                 SendPlayerToPlayerEvent.ACTION,
-                new SendPlayerToPlayerEvent(Collections.singleton(sendPlayerUUID), toPlayerUUID, null, null)
+                new SendPlayerToPlayerEvent(Collections.singleton(sendPlayerUUID), toPlayerUUID, doneMessage, doneTargetMessage)
         );
     }
 
@@ -549,44 +526,11 @@ public abstract class BallAPI {
      * @param toPlayerUUID   传送的目标玩家
      * @param doneMessage    传送完成后显示的消息
      */
-    public void sendPlayerToPlayer(@NotNull UUID sendPlayerUUID, @NotNull UUID toPlayerUUID, @Nullable Message doneMessage) {
-        sendMessagingMessage(
+    public void sendPlayerToPlayer(@NotNull HashSet<UUID> sendPlayerUUID, @NotNull UUID toPlayerUUID, @Nullable Message doneMessage, @Nullable Message doneTargetMessage) {
+        sendBallMessage(
                 BALL_CHANNEL,
                 SendPlayerToPlayerEvent.ACTION,
-                new SendPlayerToPlayerEvent(Collections.singleton(sendPlayerUUID), toPlayerUUID, doneMessage, null)
-        );
-    }
-
-    /**
-     * 把玩家传送到另一个玩家身边
-     * <p>
-     * 支持跨服传送
-     *
-     * @param sendPlayers  被传送的玩家
-     * @param toPlayerUUID 传送的目标玩家
-     */
-    public void sendPlayerToPlayer(@NotNull HashSet<UUID> sendPlayers, @NotNull UUID toPlayerUUID) {
-        sendMessagingMessage(
-                BALL_CHANNEL,
-                SendPlayerToPlayerEvent.ACTION,
-                new SendPlayerToPlayerEvent(sendPlayers, toPlayerUUID, null, null)
-        );
-    }
-
-    /**
-     * 把玩家传送到另一个玩家身边
-     * <p>
-     * 支持跨服传送
-     *
-     * @param sendPlayers  被传送的玩家
-     * @param toPlayerUUID 传送的目标玩家
-     * @param doneMessage  传送完成后显示的消息
-     */
-    public void sendPlayerToPlayer(@NotNull HashSet<UUID> sendPlayers, @NotNull UUID toPlayerUUID, @Nullable Message doneMessage, @Nullable Message doneTargetMessage) {
-        sendMessagingMessage(
-                BALL_CHANNEL,
-                SendPlayerToPlayerEvent.ACTION,
-                new SendPlayerToPlayerEvent(sendPlayers, toPlayerUUID, doneMessage, doneTargetMessage)
+                new SendPlayerToPlayerEvent(sendPlayerUUID, toPlayerUUID, doneMessage, doneTargetMessage)
         );
     }
 
@@ -596,8 +540,8 @@ public abstract class BallAPI {
      * @param channel 消息标签
      * @param action  执行动作
      */
-    public void sendMessagingMessage(@NotNull String channel, @NotNull String action) {
-        sendMessagingMessage(new ServiceMessageInfo(channel, getLocalServerId(), null, null, action, null));
+    public void sendBallMessage(@NotNull String channel, @NotNull String action) {
+        sendBallMessage(new MessageInfo(channel, getLocalServerId(), null, null, action, null));
     }
 
     /**
@@ -607,8 +551,8 @@ public abstract class BallAPI {
      * @param action  执行动作
      * @param content 附加参数
      */
-    public void sendMessagingMessage(@NotNull String channel, @NotNull String action, @NotNull String content) {
-        sendMessagingMessage(new ServiceMessageInfo(channel, getLocalServerId(), null, null, action, new JsonPrimitive(content)));
+    public void sendBallMessage(@NotNull String channel, @NotNull String action, @NotNull String content) {
+        sendBallMessage(new MessageInfo(channel, getLocalServerId(), null, null, action, new JsonPrimitive(content)));
     }
 
     /**
@@ -618,8 +562,8 @@ public abstract class BallAPI {
      * @param action  执行动作
      * @param content 附加参数
      */
-    public void sendMessagingMessage(@NotNull String channel, @NotNull String action, @NotNull JsonElement content) {
-        sendMessagingMessage(new ServiceMessageInfo(channel, getLocalServerId(), null, null, action, content));
+    public void sendBallMessage(@NotNull String channel, @NotNull String action, @NotNull JsonElement content) {
+        sendBallMessage(new MessageInfo(channel, getLocalServerId(), null, null, action, content));
     }
 
     /**
@@ -629,8 +573,8 @@ public abstract class BallAPI {
      * @param action  执行动作
      * @param content 附加参数
      */
-    public void sendMessagingMessage(@NotNull String channel, @NotNull String action, @NotNull Object content) {
-        sendMessagingMessage(new ServiceMessageInfo(channel, getLocalServerId(), null, null, action, CoreConstantObjects.GSON.toJsonTree(content)));
+    public void sendBallMessage(@NotNull String channel, @NotNull String action, @NotNull Object content) {
+        sendBallMessage(new MessageInfo(channel, getLocalServerId(), null, null, action, CoreConstantObjects.GSON.toJsonTree(content)));
     }
 
     /**
@@ -640,8 +584,8 @@ public abstract class BallAPI {
      * @param action  执行动作
      * @param content 附加参数
      */
-    public void sendMessagingMessage(@NotNull String channel, @Nullable ServerType receiverType, @NotNull String action, @NotNull JsonElement content) {
-        sendMessagingMessage(new ServiceMessageInfo(channel, getLocalServerId(), null, receiverType, action, content));
+    public void sendBallMessage(@NotNull String channel, @Nullable ServerType receiverType, @NotNull String action, @NotNull JsonElement content) {
+        sendBallMessage(new MessageInfo(channel, getLocalServerId(), null, receiverType, action, content));
     }
 
     /**
@@ -651,8 +595,8 @@ public abstract class BallAPI {
      * @param action  执行动作
      * @param content 附加参数
      */
-    public void sendMessagingMessage(@NotNull String channel, @Nullable ServerType receiverType, @NotNull String action, @NotNull Object content) {
-        sendMessagingMessage(new ServiceMessageInfo(channel, getLocalServerId(), null, receiverType, action, CoreConstantObjects.GSON.toJsonTree(content)));
+    public void sendBallMessage(@NotNull String channel, @Nullable ServerType receiverType, @NotNull String action, @NotNull Object content) {
+        sendBallMessage(new MessageInfo(channel, getLocalServerId(), null, receiverType, action, CoreConstantObjects.GSON.toJsonTree(content)));
     }
 
     /**
@@ -660,8 +604,8 @@ public abstract class BallAPI {
      *
      * @param messageInfo 消息内容
      */
-    public void sendMessagingMessage(@NotNull ServiceMessageInfo messageInfo) {
-        sendMessagingMessage(messageInfo, false);
+    public void sendBallMessage(@NotNull MessageInfo messageInfo) {
+        sendBallMessage(messageInfo, false);
     }
 
     /**
@@ -670,7 +614,7 @@ public abstract class BallAPI {
      * @param messageInfo 消息内容
      * @param block       是否阻塞（设置为 true 则必须等待消息写入网络的操作完成后，该方法才会退出）
      */
-    public void sendMessagingMessage(@NotNull ServiceMessageInfo messageInfo, boolean block) {
+    public void sendBallMessage(@NotNull MessageInfo messageInfo, boolean block) {
         if (channel == null || !channel.isWritable()) {
             return;
         }

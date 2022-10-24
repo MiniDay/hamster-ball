@@ -1,6 +1,5 @@
 package cn.hamster3.mc.plugin.ball.common.entity;
 
-import com.google.gson.JsonElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
@@ -24,11 +23,6 @@ public class PlayerInfo {
      */
     @NotNull
     private String name;
-    /**
-     * 玩家的档案（包含皮肤等信息）
-     */
-    @NotNull
-    private JsonElement profile;
     /**
      * 玩家所在的游戏服务器 ID
      * <p>

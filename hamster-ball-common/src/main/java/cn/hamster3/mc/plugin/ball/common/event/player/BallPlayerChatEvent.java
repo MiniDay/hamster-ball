@@ -12,7 +12,7 @@ import java.util.UUID;
  */
 @Data
 @AllArgsConstructor
-public class PlayerChatEvent {
+public class BallPlayerChatEvent {
     public static final String ACTION = "PlayerChat";
 
     @NotNull

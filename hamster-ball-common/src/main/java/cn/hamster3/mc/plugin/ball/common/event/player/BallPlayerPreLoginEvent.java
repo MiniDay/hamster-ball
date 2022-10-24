@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
  */
 @Data
 @AllArgsConstructor
-public class PlayerPreLoginEvent {
+public class BallPlayerPreLoginEvent {
     public static final String ACTION = "PlayerPreLogin";
 
     @NotNull
