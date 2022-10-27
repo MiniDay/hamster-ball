@@ -1,4 +1,3 @@
-version = '1.0.0'
 setArchivesBaseName("HamsterBall-Common")
 
 dependencies {

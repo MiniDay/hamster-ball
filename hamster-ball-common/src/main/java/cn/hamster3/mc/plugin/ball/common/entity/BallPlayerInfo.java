@@ -12,7 +12,7 @@ import java.util.UUID;
 @Data
 @NotNull
 @AllArgsConstructor
-public class PlayerInfo {
+public class BallPlayerInfo {
     /**
      * 玩家的uuid
      */
@@ -47,7 +47,7 @@ public class PlayerInfo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        PlayerInfo that = (PlayerInfo) o;
+        BallPlayerInfo that = (BallPlayerInfo) o;
 
         return uuid.equals(that.uuid);
     }

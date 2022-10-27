@@ -2,8 +2,8 @@ package cn.hamster3.mc.plugin.core.bungee.api;
 
 import cn.hamster3.mc.plugin.ball.common.api.BallAPI;
 import cn.hamster3.mc.plugin.ball.common.config.BallConfig;
-import cn.hamster3.mc.plugin.ball.common.entity.ServerInfo;
-import cn.hamster3.mc.plugin.ball.common.entity.ServerType;
+import cn.hamster3.mc.plugin.ball.common.entity.BallServerInfo;
+import cn.hamster3.mc.plugin.ball.common.entity.BallServerType;
 import cn.hamster3.mc.plugin.core.bungee.HamsterBallPlugin;
 import cn.hamster3.mc.plugin.core.bungee.listener.BallBungeeCordListener;
 import cn.hamster3.mc.plugin.core.bungee.util.BungeeCordUtils;
@@ -35,10 +35,10 @@ public class BallBungeeCordAPI extends BallAPI {
         Optional<InetSocketAddress> address = ProxyServer.getInstance().getConfig().getListeners().stream().findFirst().map(ListenerInfo::getHost);
         String host = pluginConfig.getString("server-info.name.host", address.map(InetSocketAddress::getHostName).orElse(""));
         BallConfig config = new BallConfig(
-                new ServerInfo(
+                new BallServerInfo(
                         pluginConfig.getString("server-info.id"),
                         pluginConfig.getString("server-info.name"),
-                        ServerType.GAME,
+                        BallServerType.GAME,
                         host.isEmpty() ? "127.0.0.1" : host,
                         pluginConfig.getInt("server-info.name.port", address.map(InetSocketAddress::getPort).orElse(25577))
                 ),

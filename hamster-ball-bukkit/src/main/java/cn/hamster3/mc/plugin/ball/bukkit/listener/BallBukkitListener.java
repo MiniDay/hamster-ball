@@ -2,13 +2,15 @@ package cn.hamster3.mc.plugin.ball.bukkit.listener;
 
 import cn.hamster3.mc.plugin.ball.bukkit.data.BukkitLocation;
 import cn.hamster3.mc.plugin.ball.common.api.BallAPI;
-import cn.hamster3.mc.plugin.ball.common.data.ServiceLocation;
-import cn.hamster3.mc.plugin.ball.common.entity.ServerType;
+import cn.hamster3.mc.plugin.ball.common.data.BallLocation;
+import cn.hamster3.mc.plugin.ball.common.data.BallMessageInfo;
+import cn.hamster3.mc.plugin.ball.common.entity.BallServerType;
 import cn.hamster3.mc.plugin.ball.common.event.operate.DispatchConsoleCommandEvent;
 import cn.hamster3.mc.plugin.ball.common.event.operate.DispatchPlayerCommandEvent;
 import cn.hamster3.mc.plugin.ball.common.event.operate.SendPlayerToLocationEvent;
 import cn.hamster3.mc.plugin.ball.common.event.operate.SendPlayerToPlayerEvent;
 import cn.hamster3.mc.plugin.ball.common.listener.BallListener;
+import cn.hamster3.mc.plugin.core.common.constant.CoreConstantObjects;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -28,61 +30,69 @@ public class BallBukkitListener extends BallListener implements Listener {
 
     private final HashMap<UUID, Location> playerToLocation = new HashMap<>();
 
-    @Override
-    public void onDispatchConsoleCommand(@NotNull DispatchConsoleCommandEvent event) {
-        if (event.getType() != null && event.getType() != ServerType.GAME) {
-            return;
-        }
-        if (event.getServerID() != null && !BallAPI.getInstance().isLocalServer(event.getServerID())) {
-            return;
-        }
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), event.getCommand());
-    }
-
-    @Override
-    public void onDispatchPlayerCommand(@NotNull DispatchPlayerCommandEvent event) {
-        if (event.getType() != null && event.getType() != ServerType.GAME) {
-            return;
-        }
-        if (event.getUuid() != null) {
-            Player player = Bukkit.getPlayer(event.getUuid());
-            if (player == null) {
-                return;
-            }
-            Bukkit.dispatchCommand(player, event.getCommand());
-            return;
-        }
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            Bukkit.dispatchCommand(player, event.getCommand());
-        }
-    }
-
-    @Override
-    public void onSendPlayerToLocation(@NotNull SendPlayerToLocationEvent event) {
-        ServiceLocation location = event.getLocation();
-        if (!BallAPI.getInstance().isLocalServer(location.getServerID())) {
-            return;
-        }
-        for (UUID uuid : event.getSendPlayerUUID()) {
-            playerToLocation.put(uuid, new BukkitLocation(location).toBukkitLocation());
-        }
-    }
-
-    @Override
-    public void onSendPlayerToPlayer(@NotNull SendPlayerToPlayerEvent event) {
-        Player player = Bukkit.getPlayer(event.getToPlayerUUID());
-        if (player == null) {
-            return;
-        }
-        Location location = player.getLocation();
-        for (UUID uuid : event.getSendPlayerUUID()) {
-            playerToLocation.put(uuid, location);
-        }
+    private BallBukkitListener() {
     }
 
     @Override
     public void onReconnectFailed() {
         Bukkit.shutdown();
+    }
+
+    @Override
+    public void onMessageReceived(@NotNull BallMessageInfo info) {
+        switch (info.getAction()) {
+            case DispatchConsoleCommandEvent.ACTION: {
+                DispatchConsoleCommandEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), DispatchConsoleCommandEvent.class);
+                if (event.getType() != null && event.getType() != BallServerType.GAME) {
+                    return;
+                }
+                if (event.getServerID() != null && !BallAPI.getInstance().isLocalServer(event.getServerID())) {
+                    return;
+                }
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), event.getCommand());
+                break;
+            }
+            case DispatchPlayerCommandEvent.ACTION: {
+                DispatchPlayerCommandEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), DispatchPlayerCommandEvent.class);
+                if (event.getType() != null && event.getType() != BallServerType.GAME) {
+                    return;
+                }
+                if (event.getUuid() != null) {
+                    Player player = Bukkit.getPlayer(event.getUuid());
+                    if (player == null) {
+                        return;
+                    }
+                    Bukkit.dispatchCommand(player, event.getCommand());
+                    return;
+                }
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    Bukkit.dispatchCommand(player, event.getCommand());
+                }
+                break;
+            }
+            case SendPlayerToLocationEvent.ACTION: {
+                SendPlayerToLocationEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), SendPlayerToLocationEvent.class);
+                BallLocation location = event.getLocation();
+                if (BallAPI.getInstance().isLocalServer(location.getServerID())) {
+                    for (UUID uuid : event.getSendPlayerUUID()) {
+                        playerToLocation.put(uuid, new BukkitLocation(location).toBukkitLocation());
+                    }
+                }
+                break;
+            }
+            case SendPlayerToPlayerEvent.ACTION: {
+                SendPlayerToPlayerEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), SendPlayerToPlayerEvent.class);
+                Player player = Bukkit.getPlayer(event.getToPlayerUUID());
+                if (player == null) {
+                    return;
+                }
+                Location location = player.getLocation();
+                for (UUID uuid : event.getSendPlayerUUID()) {
+                    playerToLocation.put(uuid, location);
+                }
+                break;
+            }
+        }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)

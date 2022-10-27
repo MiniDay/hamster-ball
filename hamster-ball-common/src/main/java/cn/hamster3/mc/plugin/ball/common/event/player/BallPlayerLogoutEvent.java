@@ -1,6 +1,6 @@
 package cn.hamster3.mc.plugin.ball.common.event.player;
 
-import cn.hamster3.mc.plugin.ball.common.entity.PlayerInfo;
+import cn.hamster3.mc.plugin.ball.common.entity.BallPlayerInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
@@ -14,5 +14,5 @@ public class BallPlayerLogoutEvent {
     public static final String ACTION = "PlayerLogout";
 
     @NotNull
-    private PlayerInfo playerInfo;
+    private BallPlayerInfo playerInfo;
 }

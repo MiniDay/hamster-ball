@@ -1,7 +1,7 @@
 package cn.hamster3.mc.plugin.ball.bukkit.data;
 
 import cn.hamster3.mc.plugin.ball.common.api.BallAPI;
-import cn.hamster3.mc.plugin.ball.common.data.ServiceBlockPos;
+import cn.hamster3.mc.plugin.ball.common.data.BallBlockPos;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -9,7 +9,7 @@ import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
-public class BukkitBlockPos extends ServiceBlockPos {
+public class BukkitBlockPos extends BallBlockPos {
     public BukkitBlockPos(@NotNull String serverID, @NotNull String worldName, int x, int y, int z) {
         super(serverID, worldName, x, y, z);
     }
@@ -32,7 +32,7 @@ public class BukkitBlockPos extends ServiceBlockPos {
         );
     }
 
-    public BukkitBlockPos(@NotNull ServiceBlockPos location) {
+    public BukkitBlockPos(@NotNull BallBlockPos location) {
         super(
                 BallAPI.getInstance().getLocalServerId(),
                 location.getWorldName(),

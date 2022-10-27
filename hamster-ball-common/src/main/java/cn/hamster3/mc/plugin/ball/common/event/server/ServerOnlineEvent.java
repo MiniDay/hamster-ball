@@ -1,6 +1,6 @@
 package cn.hamster3.mc.plugin.ball.common.event.server;
 
-import cn.hamster3.mc.plugin.ball.common.entity.ServerInfo;
+import cn.hamster3.mc.plugin.ball.common.entity.BallServerInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
@@ -14,6 +14,6 @@ public class ServerOnlineEvent {
     public static final String ACTION = "ServerOnline";
 
     @NotNull
-    private final ServerInfo serverInfo;
+    private final BallServerInfo serverInfo;
 
 }

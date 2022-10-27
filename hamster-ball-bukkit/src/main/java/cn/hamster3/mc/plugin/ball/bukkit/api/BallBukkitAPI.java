@@ -4,8 +4,8 @@ import cn.hamster3.mc.plugin.ball.bukkit.HamsterBallPlugin;
 import cn.hamster3.mc.plugin.ball.bukkit.listener.BallBukkitListener;
 import cn.hamster3.mc.plugin.ball.common.api.BallAPI;
 import cn.hamster3.mc.plugin.ball.common.config.BallConfig;
-import cn.hamster3.mc.plugin.ball.common.entity.ServerInfo;
-import cn.hamster3.mc.plugin.ball.common.entity.ServerType;
+import cn.hamster3.mc.plugin.ball.common.entity.BallServerInfo;
+import cn.hamster3.mc.plugin.ball.common.entity.BallServerType;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -31,10 +31,10 @@ public class BallBukkitAPI extends BallAPI {
 
         String host = pluginConfig.getString("server-info.name.host", Bukkit.getIp());
         BallConfig config = new BallConfig(
-                new ServerInfo(
+                new BallServerInfo(
                         pluginConfig.getString("server-info.id"),
                         pluginConfig.getString("server-info.name"),
-                        ServerType.GAME,
+                        BallServerType.GAME,
                         host.isEmpty() ? "127.0.0.1" : host,
                         pluginConfig.getInt("server-info.name.port", Bukkit.getPort())
                 ),

@@ -1,13 +1,15 @@
 package cn.hamster3.mc.plugin.core.bungee.listener;
 
 import cn.hamster3.mc.plugin.ball.common.api.BallAPI;
-import cn.hamster3.mc.plugin.ball.common.entity.PlayerInfo;
-import cn.hamster3.mc.plugin.ball.common.entity.ServerType;
+import cn.hamster3.mc.plugin.ball.common.data.BallMessageInfo;
+import cn.hamster3.mc.plugin.ball.common.entity.BallPlayerInfo;
+import cn.hamster3.mc.plugin.ball.common.entity.BallServerType;
 import cn.hamster3.mc.plugin.ball.common.event.operate.*;
 import cn.hamster3.mc.plugin.ball.common.event.player.*;
 import cn.hamster3.mc.plugin.ball.common.listener.BallListener;
 import cn.hamster3.mc.plugin.core.bungee.util.BallBungeeCordUtils;
 import cn.hamster3.mc.plugin.core.common.api.CoreAPI;
+import cn.hamster3.mc.plugin.core.common.constant.CoreConstantObjects;
 import cn.hamster3.mc.plugin.core.common.data.Message;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
@@ -29,56 +31,67 @@ public final class BallBungeeCordListener extends BallListener implements Listen
     }
 
     @Override
-    public void onBroadcastPlayerMessage(@NotNull BroadcastPlayerMessageEvent event) {
-        Message message = event.getMessage();
-        Audience audience = CoreAPI.getInstance().getAudienceProvider().all();
-        message.show(audience);
+    public void onReconnectFailed() {
+        ProxyServer.getInstance().stop();
     }
 
     @Override
-    public void onDispatchConsoleCommand(@NotNull DispatchConsoleCommandEvent event) {
-        if (event.getType() != null && event.getType() != ServerType.PROXY) {
-            return;
-        }
-        if (event.getServerID() != null && !BallAPI.getInstance().isLocalServer(event.getServerID())) {
-            return;
-        }
-        ProxyServer server = ProxyServer.getInstance();
-        server.getPluginManager().dispatchCommand(server.getConsole(), event.getCommand());
-    }
-
-    @Override
-    public void onDispatchPlayerCommand(@NotNull DispatchPlayerCommandEvent event) {
-        if (event.getType() != null && event.getType() != ServerType.GAME) {
-            return;
-        }
-        ProxyServer server = ProxyServer.getInstance();
-        if (event.getUuid() != null) {
-            ProxiedPlayer player = server.getPlayer(event.getUuid());
-            if (player == null) {
-                return;
+    public void onMessageReceived(@NotNull BallMessageInfo info) {
+        switch (info.getAction()) {
+            case BroadcastPlayerMessageEvent.ACTION: {
+                BroadcastPlayerMessageEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), BroadcastPlayerMessageEvent.class);
+                Message message = event.getMessage();
+                Audience audience = CoreAPI.getInstance().getAudienceProvider().all();
+                message.show(audience);
+                break;
             }
-            server.getPluginManager().dispatchCommand(player, event.getCommand());
-            return;
+            case DispatchConsoleCommandEvent.ACTION: {
+                DispatchConsoleCommandEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), DispatchConsoleCommandEvent.class);
+                if (event.getType() != null && event.getType() != BallServerType.PROXY) {
+                    return;
+                }
+                if (event.getServerID() != null && !BallAPI.getInstance().isLocalServer(event.getServerID())) {
+                    return;
+                }
+                ProxyServer server = ProxyServer.getInstance();
+                server.getPluginManager().dispatchCommand(server.getConsole(), event.getCommand());
+                break;
+            }
+            case DispatchPlayerCommandEvent.ACTION: {
+                DispatchPlayerCommandEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), DispatchPlayerCommandEvent.class);
+                if (event.getType() != null && event.getType() != BallServerType.GAME) {
+                    return;
+                }
+                ProxyServer server = ProxyServer.getInstance();
+                if (event.getUuid() != null) {
+                    ProxiedPlayer player = server.getPlayer(event.getUuid());
+                    if (player == null) {
+                        return;
+                    }
+                    server.getPluginManager().dispatchCommand(player, event.getCommand());
+                    return;
+                }
+                for (ProxiedPlayer player : server.getPlayers()) {
+                    server.getPluginManager().dispatchCommand(player, event.getCommand());
+                }
+                break;
+            }
+            case KickPlayerEvent.ACTION: {
+                KickPlayerEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), KickPlayerEvent.class);
+                ProxiedPlayer player = ProxyServer.getInstance().getPlayer(event.getUuid());
+                BaseComponent[] components = BungeeComponentSerializer.get().serialize(event.getReason());
+                player.disconnect(components);
+                break;
+            }
+            case SendMessageToPlayerEvent.ACTION: {
+                SendMessageToPlayerEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), SendMessageToPlayerEvent.class);
+                for (UUID uuid : event.getReceiver()) {
+                    Audience audience = CoreAPI.getInstance().getAudienceProvider().player(uuid);
+                    event.getMessage().show(audience);
+                }
+                break;
+            }
         }
-        for (ProxiedPlayer player : server.getPlayers()) {
-            server.getPluginManager().dispatchCommand(player, event.getCommand());
-        }
-    }
-
-    @Override
-    public void onSendMessageToPlayer(@NotNull SendMessageToPlayerEvent event) {
-        for (UUID uuid : event.getReceiver()) {
-            Audience audience = CoreAPI.getInstance().getAudienceProvider().player(uuid);
-            event.getMessage().show(audience);
-        }
-    }
-
-    @Override
-    public void onKickPlayer(@NotNull KickPlayerEvent event) {
-        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(event.getUuid());
-        BaseComponent[] components = BungeeComponentSerializer.get().serialize(event.getReason());
-        player.disconnect(components);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -98,7 +111,7 @@ public final class BallBungeeCordListener extends BallListener implements Listen
         BallAPI.getInstance().sendBallMessage(
                 BallAPI.BALL_CHANNEL,
                 BallPlayerLoginEvent.ACTION,
-                new BallPlayerLoginEvent(new PlayerInfo(
+                new BallPlayerLoginEvent(new BallPlayerInfo(
                         event.getConnection().getUniqueId(),
                         event.getConnection().getName(),
                         "",
@@ -121,7 +134,7 @@ public final class BallBungeeCordListener extends BallListener implements Listen
     @EventHandler(priority = EventPriority.HIGH)
     public void onServerConnect(ServerConnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
-        PlayerInfo playerInfo = BallBungeeCordUtils.getPlayerInfo(player, true);
+        BallPlayerInfo playerInfo = BallBungeeCordUtils.getPlayerInfo(player, true);
         BallAPI.getInstance().sendBallMessage(
                 BallAPI.BALL_CHANNEL,
                 BallPlayerConnectServerEvent.ACTION,
@@ -132,7 +145,7 @@ public final class BallBungeeCordListener extends BallListener implements Listen
     @EventHandler(priority = EventPriority.HIGH)
     public void onServerConnected(ServerConnectedEvent event) {
         ProxiedPlayer player = event.getPlayer();
-        PlayerInfo playerInfo = BallBungeeCordUtils.getPlayerInfo(player, true);
+        BallPlayerInfo playerInfo = BallBungeeCordUtils.getPlayerInfo(player, true);
         BallAPI.getInstance().sendBallMessage(
                 BallAPI.BALL_CHANNEL,
                 BallPlayerPostConnectServerEvent.ACTION,

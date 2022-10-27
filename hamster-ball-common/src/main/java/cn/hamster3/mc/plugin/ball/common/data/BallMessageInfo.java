@@ -1,6 +1,6 @@
 package cn.hamster3.mc.plugin.ball.common.data;
 
-import cn.hamster3.mc.plugin.ball.common.entity.ServerType;
+import cn.hamster3.mc.plugin.ball.common.entity.BallServerType;
 import cn.hamster3.mc.plugin.core.common.constant.CoreConstantObjects;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -22,7 +22,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuppressWarnings("unused")
-public class MessageInfo {
+public class BallMessageInfo {
     /**
      * 消息的频道
      */
@@ -50,7 +50,7 @@ public class MessageInfo {
      * 若不设定（值为null），则该消息会广播给所有子端
      */
     @Nullable
-    private ServerType receiverType;
+    private BallServerType receiverType;
     /**
      * 消息动作
      * <p>

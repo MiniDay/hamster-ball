@@ -1,8 +1,7 @@
 package cn.hamster3.mc.plugin.ball.common.connector;
 
 import cn.hamster3.mc.plugin.ball.common.api.BallAPI;
-import cn.hamster3.mc.plugin.ball.common.data.MessageInfo;
-import cn.hamster3.mc.plugin.ball.common.event.operate.*;
+import cn.hamster3.mc.plugin.ball.common.data.BallMessageInfo;
 import cn.hamster3.mc.plugin.ball.common.event.player.*;
 import cn.hamster3.mc.plugin.ball.common.event.server.ServerOfflineEvent;
 import cn.hamster3.mc.plugin.ball.common.event.server.ServerOnlineEvent;
@@ -20,7 +19,7 @@ public class BallChannelInboundHandler extends SimpleChannelInboundHandler<Strin
 
     @Override
     protected void channelRead0(ChannelHandlerContext context, String message) {
-        MessageInfo info = CoreConstantObjects.GSON.fromJson(message, MessageInfo.class);
+        BallMessageInfo info = CoreConstantObjects.GSON.fromJson(message, BallMessageInfo.class);
         for (BallListener listener : BallAPI.getInstance().getListeners()) {
             try {
                 listener.onMessageReceived(info);
@@ -32,83 +31,6 @@ public class BallChannelInboundHandler extends SimpleChannelInboundHandler<Strin
             return;
         }
         switch (info.getAction()) {
-            case BroadcastPlayerMessageEvent.ACTION: {
-                BroadcastPlayerMessageEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), BroadcastPlayerMessageEvent.class);
-                for (BallListener listener : BallAPI.getInstance().getListeners()) {
-                    try {
-                        listener.onBroadcastPlayerMessage(event);
-                    } catch (Exception | Error e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-            }
-            case DispatchConsoleCommandEvent.ACTION: {
-                DispatchConsoleCommandEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), DispatchConsoleCommandEvent.class);
-                for (BallListener listener : BallAPI.getInstance().getListeners()) {
-                    try {
-                        listener.onDispatchConsoleCommand(event);
-                    } catch (Exception | Error e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-            }
-            case DispatchPlayerCommandEvent.ACTION: {
-                DispatchPlayerCommandEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), DispatchPlayerCommandEvent.class);
-                for (BallListener listener : BallAPI.getInstance().getListeners()) {
-                    try {
-                        listener.onDispatchPlayerCommand(event);
-                    } catch (Exception | Error e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-            }
-            case KickPlayerEvent.ACTION: {
-                KickPlayerEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), KickPlayerEvent.class);
-                for (BallListener listener : BallAPI.getInstance().getListeners()) {
-                    try {
-                        listener.onKickPlayer(event);
-                    } catch (Exception | Error e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-            }
-            case SendMessageToPlayerEvent.ACTION: {
-                SendMessageToPlayerEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), SendMessageToPlayerEvent.class);
-                for (BallListener listener : BallAPI.getInstance().getListeners()) {
-                    try {
-                        listener.onSendMessageToPlayer(event);
-                    } catch (Exception | Error e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-            }
-            case SendPlayerToLocationEvent.ACTION: {
-                SendPlayerToLocationEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), SendPlayerToLocationEvent.class);
-                for (BallListener listener : BallAPI.getInstance().getListeners()) {
-                    try {
-                        listener.onSendPlayerToLocation(event);
-                    } catch (Exception | Error e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-            }
-            case SendPlayerToPlayerEvent.ACTION: {
-                SendPlayerToPlayerEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), SendPlayerToPlayerEvent.class);
-                for (BallListener listener : BallAPI.getInstance().getListeners()) {
-                    try {
-                        listener.onSendPlayerToPlayer(event);
-                    } catch (Exception | Error e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-            }
             case BallPlayerPreLoginEvent.ACTION: {
                 BallPlayerPreLoginEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), BallPlayerPreLoginEvent.class);
                 for (BallListener listener : BallAPI.getInstance().getListeners()) {

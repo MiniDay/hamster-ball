@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuppressWarnings("unused")
-public class ServiceBlockPos {
+public class BallBlockPos {
     private String serverID;
     private String worldName;
     private int x;
@@ -17,7 +17,7 @@ public class ServiceBlockPos {
     private int z;
 
     @NotNull
-    public ServiceLocation toServiceLocation() {
-        return new ServiceLocation(getServerID(), getWorldName(), getX(), getY(), getZ(), 0, 0);
+    public BallLocation toServiceLocation() {
+        return new BallLocation(getServerID(), getWorldName(), getX(), getY(), getZ(), 0, 0);
     }
 }

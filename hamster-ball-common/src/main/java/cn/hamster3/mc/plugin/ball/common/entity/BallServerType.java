@@ -4,7 +4,7 @@ package cn.hamster3.mc.plugin.ball.common.entity;
  * Service 接入者的类型
  */
 @SuppressWarnings("unused")
-public enum ServerType {
+public enum BallServerType {
     /**
      * 游戏服务器
      */

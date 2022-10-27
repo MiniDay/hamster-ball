@@ -1,6 +1,6 @@
 package cn.hamster3.mc.plugin.ball.common.event.operate;
 
-import cn.hamster3.mc.plugin.ball.common.data.ServiceLocation;
+import cn.hamster3.mc.plugin.ball.common.data.BallLocation;
 import cn.hamster3.mc.plugin.core.common.data.Message;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,7 +18,7 @@ public class SendPlayerToLocationEvent {
     @NotNull
     private final Set<UUID> sendPlayerUUID;
     @NotNull
-    private final ServiceLocation location;
+    private final BallLocation location;
     @Nullable
     private final Message doneMessage;
 

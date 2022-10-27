@@ -1,4 +1,3 @@
-version = '1.0.0'
 setArchivesBaseName("HamsterBall-BungeeCord")
 
 evaluationDependsOn(':hamster-ball-common')
@@ -8,7 +7,7 @@ dependencies {
         exclude group: "*"
     }
 
-    compileOnly 'net.md-5:bungeecord-api:1.17-R0.1-SNAPSHOT'
+    compileOnly 'net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT'
     compileOnly "cn.hamster3.mc.plugin:hamster-core-bungeecord:${hamster_core_version}"
 }
 

@@ -1,12 +1,12 @@
 package cn.hamster3.mc.plugin.ball.common.listener;
 
-import cn.hamster3.mc.plugin.ball.common.data.MessageInfo;
-import cn.hamster3.mc.plugin.ball.common.event.operate.*;
+import cn.hamster3.mc.plugin.ball.common.data.BallMessageInfo;
 import cn.hamster3.mc.plugin.ball.common.event.player.*;
 import cn.hamster3.mc.plugin.ball.common.event.server.ServerOfflineEvent;
 import cn.hamster3.mc.plugin.ball.common.event.server.ServerOnlineEvent;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("unused")
 public abstract class BallListener {
     /**
      * 该监听器的执行优先级
@@ -17,25 +17,16 @@ public abstract class BallListener {
         return ListenerPriority.NORMAL;
     }
 
-    public void onBroadcastPlayerMessage(@NotNull BroadcastPlayerMessageEvent event) {
+    public void onConnectActive() {
     }
 
-    public void onDispatchConsoleCommand(@NotNull DispatchConsoleCommandEvent event) {
+    public void onConnectInactive() {
     }
 
-    public void onDispatchPlayerCommand(@NotNull DispatchPlayerCommandEvent event) {
+    public void onConnectException(Throwable throwable) {
     }
 
-    public void onKickPlayer(@NotNull KickPlayerEvent event) {
-    }
-
-    public void onSendMessageToPlayer(@NotNull SendMessageToPlayerEvent event) {
-    }
-
-    public void onSendPlayerToLocation(@NotNull SendPlayerToLocationEvent event) {
-    }
-
-    public void onSendPlayerToPlayer(@NotNull SendPlayerToPlayerEvent event) {
+    public void onReconnectFailed() {
     }
 
     public void onBallPlayerPreLogin(@NotNull BallPlayerPreLoginEvent event) {
@@ -68,19 +59,10 @@ public abstract class BallListener {
     public void onServerOnline(@NotNull ServerOnlineEvent event) {
     }
 
-    public void onMessageSend(@NotNull MessageInfo event) {
+    public void onMessageSend(@NotNull BallMessageInfo event) {
     }
 
-    public void onMessageReceived(@NotNull MessageInfo event) {
-    }
-
-    public void onConnectInactive() {
-    }
-
-    public void onConnectException(Throwable throwable) {
-    }
-
-    public void onReconnectFailed() {
+    public void onMessageReceived(@NotNull BallMessageInfo event) {
     }
 
 }

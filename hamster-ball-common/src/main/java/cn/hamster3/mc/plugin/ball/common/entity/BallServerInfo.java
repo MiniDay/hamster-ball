@@ -12,7 +12,7 @@ import java.util.Objects;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ServerInfo {
+public class BallServerInfo {
     /**
      * 服务器 ID
      * <p>
@@ -28,7 +28,7 @@ public class ServerInfo {
     /**
      * 服务器类型
      */
-    private ServerType type;
+    private BallServerType type;
     /**
      * 服务器主机名
      * <p>
@@ -44,7 +44,7 @@ public class ServerInfo {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ServerInfo that = (ServerInfo) o;
+        BallServerInfo that = (BallServerInfo) o;
         return id.equals(that.id);
     }
 
