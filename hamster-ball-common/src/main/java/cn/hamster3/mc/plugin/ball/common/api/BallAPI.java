@@ -467,7 +467,6 @@ public abstract class BallAPI {
         );
     }
 
-
     /**
      * 把玩家传送到一个位置
      * <p>
@@ -722,6 +721,21 @@ public abstract class BallAPI {
             }
             return null;
         });
+    }
+
+    /**
+     * 获取玩家名称
+     *
+     * @param uuid 玩家的 UUID
+     * @return 如果数据不存在，则返回字符串形式的 "null"
+     */
+    @NotNull
+    public String getPlayerName(@NotNull UUID uuid) {
+        BallPlayerInfo info = getPlayerInfo(uuid);
+        if (info == null) {
+            return "null";
+        }
+        return info.getName();
     }
 
     @NotNull
