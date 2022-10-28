@@ -1,6 +1,6 @@
 package cn.hamster3.mc.plugin.ball.common.event.operate;
 
-import cn.hamster3.mc.plugin.core.common.data.Message;
+import cn.hamster3.mc.plugin.core.common.data.DisplayMessage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
@@ -11,6 +11,6 @@ public class BroadcastPlayerMessageEvent {
     public static final String ACTION = "BroadcastPlayerMessage";
 
     @NotNull
-    private final Message message;
+    private final DisplayMessage message;
 
 }

@@ -1,6 +1,6 @@
 package cn.hamster3.mc.plugin.ball.common.event.operate;
 
-import cn.hamster3.mc.plugin.core.common.data.Message;
+import cn.hamster3.mc.plugin.core.common.data.DisplayMessage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
@@ -19,8 +19,8 @@ public class SendPlayerToPlayerEvent {
     @NotNull
     private final UUID toPlayerUUID;
     @Nullable
-    private final Message doneMessage;
+    private final DisplayMessage doneMessage;
     @Nullable
-    private final Message doneTargetMessage;
+    private final DisplayMessage doneTargetMessage;
 
 }

@@ -10,7 +10,7 @@ import cn.hamster3.mc.plugin.ball.common.listener.BallListener;
 import cn.hamster3.mc.plugin.core.bungee.util.BallBungeeCordUtils;
 import cn.hamster3.mc.plugin.core.common.api.CoreAPI;
 import cn.hamster3.mc.plugin.core.common.constant.CoreConstantObjects;
-import cn.hamster3.mc.plugin.core.common.data.Message;
+import cn.hamster3.mc.plugin.core.common.data.DisplayMessage;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.md_5.bungee.api.ProxyServer;
@@ -40,7 +40,7 @@ public final class BallBungeeCordListener extends BallListener implements Listen
         switch (info.getAction()) {
             case BroadcastPlayerMessageEvent.ACTION: {
                 BroadcastPlayerMessageEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), BroadcastPlayerMessageEvent.class);
-                Message message = event.getMessage();
+                DisplayMessage message = event.getMessage();
                 Audience audience = CoreAPI.getInstance().getAudienceProvider().all();
                 message.show(audience);
                 break;

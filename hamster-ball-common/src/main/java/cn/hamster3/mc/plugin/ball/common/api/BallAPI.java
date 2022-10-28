@@ -16,7 +16,7 @@ import cn.hamster3.mc.plugin.ball.common.listener.BallListener;
 import cn.hamster3.mc.plugin.ball.common.listener.ListenerPriority;
 import cn.hamster3.mc.plugin.core.common.api.CoreAPI;
 import cn.hamster3.mc.plugin.core.common.constant.CoreConstantObjects;
-import cn.hamster3.mc.plugin.core.common.data.Message;
+import cn.hamster3.mc.plugin.core.common.data.DisplayMessage;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -323,7 +323,7 @@ public abstract class BallAPI {
      * @param message 消息
      */
     public void broadcastPlayerMessage(@NotNull String message) {
-        broadcastPlayerMessage(new Message().message(message));
+        broadcastPlayerMessage(DisplayMessage.message(message));
     }
 
     /**
@@ -331,7 +331,7 @@ public abstract class BallAPI {
      *
      * @param message 消息
      */
-    public void broadcastPlayerMessage(@NotNull Message message) {
+    public void broadcastPlayerMessage(@NotNull DisplayMessage message) {
         sendBallMessage(
                 BALL_CHANNEL,
                 BallServerType.PROXY,
@@ -407,7 +407,7 @@ public abstract class BallAPI {
      * @param message 消息
      * @param cache   当玩家不在线时，是否缓存消息等待玩家上线再发送
      */
-    public void sendMessageToPlayer(@NotNull UUID uuid, @NotNull Message message, boolean cache) {
+    public void sendMessageToPlayer(@NotNull UUID uuid, @NotNull DisplayMessage message, boolean cache) {
         BallPlayerInfo info = getPlayerInfo(uuid);
         if (info == null || !info.isOnline()) {
             if (!cache) {
@@ -440,7 +440,7 @@ public abstract class BallAPI {
      * @param message  消息
      * @param cache    当玩家不在线时，是否缓存消息等待玩家上线再发送
      */
-    public void sendMessageToPlayer(@NotNull Set<UUID> receiver, @NotNull Message message, boolean cache) {
+    public void sendMessageToPlayer(@NotNull Set<UUID> receiver, @NotNull DisplayMessage message, boolean cache) {
         for (UUID uuid : receiver) {
             BallPlayerInfo info = getPlayerInfo(uuid);
             if (info == null || !info.isOnline()) {
@@ -478,7 +478,7 @@ public abstract class BallAPI {
      * @param location       坐标
      * @param doneMessage    传送完成后显示的消息
      */
-    public void sendPlayerToLocation(@NotNull UUID sendPlayerUUID, @NotNull BallLocation location, @Nullable Message doneMessage) {
+    public void sendPlayerToLocation(@NotNull UUID sendPlayerUUID, @NotNull BallLocation location, @Nullable DisplayMessage doneMessage) {
         sendBallMessage(
                 BALL_CHANNEL,
                 SendPlayerToLocationEvent.ACTION,
@@ -497,7 +497,7 @@ public abstract class BallAPI {
      * @param location       坐标
      * @param doneMessage    传送完成后显示的消息
      */
-    public void sendPlayerToLocation(@NotNull HashSet<UUID> sendPlayerUUID, @NotNull BallLocation location, @Nullable Message doneMessage) {
+    public void sendPlayerToLocation(@NotNull HashSet<UUID> sendPlayerUUID, @NotNull BallLocation location, @Nullable DisplayMessage doneMessage) {
         sendBallMessage(
                 BALL_CHANNEL,
                 SendPlayerToLocationEvent.ACTION,
@@ -513,7 +513,7 @@ public abstract class BallAPI {
      * @param sendPlayerUUID 被传送的玩家
      * @param toPlayerUUID   传送的目标玩家
      */
-    public void sendPlayerToPlayer(@NotNull UUID sendPlayerUUID, @NotNull UUID toPlayerUUID, @Nullable Message doneMessage, @Nullable Message doneTargetMessage) {
+    public void sendPlayerToPlayer(@NotNull UUID sendPlayerUUID, @NotNull UUID toPlayerUUID, @Nullable DisplayMessage doneMessage, @Nullable DisplayMessage doneTargetMessage) {
         sendBallMessage(
                 BALL_CHANNEL,
                 SendPlayerToPlayerEvent.ACTION,
@@ -530,7 +530,7 @@ public abstract class BallAPI {
      * @param toPlayerUUID   传送的目标玩家
      * @param doneMessage    传送完成后显示的消息
      */
-    public void sendPlayerToPlayer(@NotNull HashSet<UUID> sendPlayerUUID, @NotNull UUID toPlayerUUID, @Nullable Message doneMessage, @Nullable Message doneTargetMessage) {
+    public void sendPlayerToPlayer(@NotNull HashSet<UUID> sendPlayerUUID, @NotNull UUID toPlayerUUID, @Nullable DisplayMessage doneMessage, @Nullable DisplayMessage doneTargetMessage) {
         sendBallMessage(
                 BALL_CHANNEL,
                 SendPlayerToPlayerEvent.ACTION,
@@ -640,15 +640,15 @@ public abstract class BallAPI {
     }
 
     @NotNull
-    public List<Message> getCachedPlayerMessage(@NotNull UUID uuid) throws SQLException {
-        ArrayList<Message> list = new ArrayList<>();
+    public List<DisplayMessage> getCachedPlayerMessage(@NotNull UUID uuid) throws SQLException {
+        ArrayList<DisplayMessage> list = new ArrayList<>();
         try (Connection connection = CoreAPI.getInstance().getConnection()) {
             PreparedStatement statement = connection.prepareStatement("SELECT message FROM " + BallCommonConstants.SQL.CACHED_MESSAGE_TABLE + " WHERE `uuid`=?;");
             statement.setString(1, uuid.toString());
             ResultSet set = statement.executeQuery();
             while (set.next()) {
                 JsonObject object = CoreConstantObjects.JSON_PARSER.parse(set.getString("msg")).getAsJsonObject();
-                list.add(new Message().json(object));
+                list.add(new DisplayMessage().fromJson(object));
             }
             statement.close();
         }

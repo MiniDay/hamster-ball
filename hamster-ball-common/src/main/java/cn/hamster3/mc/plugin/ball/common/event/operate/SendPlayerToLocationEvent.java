@@ -1,7 +1,7 @@
 package cn.hamster3.mc.plugin.ball.common.event.operate;
 
 import cn.hamster3.mc.plugin.ball.common.data.BallLocation;
-import cn.hamster3.mc.plugin.core.common.data.Message;
+import cn.hamster3.mc.plugin.core.common.data.DisplayMessage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +20,6 @@ public class SendPlayerToLocationEvent {
     @NotNull
     private final BallLocation location;
     @Nullable
-    private final Message doneMessage;
+    private final DisplayMessage doneMessage;
 
 }
