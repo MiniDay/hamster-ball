@@ -19,9 +19,10 @@ public class HamsterBallPlugin extends Plugin {
         instance = this;
         Logger logger = getLogger();
         BallBungeeCordAPI.init();
-        logger.info("BallBukkitAPI 已初始化.");
+        logger.info("BallBungeeCordAPI 已初始化.");
         try {
             BallBungeeCordAPI.getInstance().enable();
+            logger.info("BallBungeeCordAPI 已启动.");
         } catch (Exception e) {
             e.printStackTrace();
             ProxyServer.getInstance().stop();
@@ -32,7 +33,7 @@ public class HamsterBallPlugin extends Plugin {
     public void onEnable() {
         Logger logger = getLogger();
         ProxyServer.getInstance().getPluginManager().registerListener(this, BallBungeeCordListener.INSTANCE);
-        logger.info("已注册 BallBukkitListener.");
+        logger.info("已注册 BallBungeeCordListener.");
         logger.info("HamsterBall 已启动.");
     }
 

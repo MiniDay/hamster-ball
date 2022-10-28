@@ -26,6 +26,7 @@ public class HamsterBallPlugin extends JavaPlugin {
         logger.info("BallBukkitAPI 已初始化.");
         try {
             BallBukkitAPI.getInstance().enable();
+            logger.info("BallBukkitAPI 已启动.");
         } catch (Exception e) {
             e.printStackTrace();
             sync(Bukkit::shutdown);

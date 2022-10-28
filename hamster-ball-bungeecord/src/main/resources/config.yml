@@ -8,3 +8,5 @@ server-info:
   id: "BungeeCord"
   # 服务端名称，用于展示给玩家看
   name: "代理端"
+  host: 0.0.0.0
+  port: 25577
