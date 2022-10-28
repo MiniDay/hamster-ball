@@ -2,8 +2,8 @@ plugins {
     id 'java'
 }
 
-group 'cn.hamster3.mc.plugin'
-version = '1.0.0-SNAPSHOT'
+group 'cn.hamster3.mc.plugin.ball'
+version '1.0.0-SNAPSHOT'
 
 subprojects {
     apply plugin: 'java-library'
@@ -25,20 +25,8 @@ subprojects {
     }
 
     dependencies {
-        // https://mvnrepository.com/artifact/org.projectlombok/lombok
-        compileOnly 'org.projectlombok:lombok:1.18.24'
-        annotationProcessor 'org.projectlombok:lombok:1.18.24'
         // https://mvnrepository.com/artifact/org.jetbrains/annotations
         compileOnly 'org.jetbrains:annotations:23.0.0'
-    }
-
-    tasks.withType(JavaCompile) {
-        options.setEncoding("UTF-8")
-    }
-
-    tasks.withType(Jar) {
-        from([rootProject.file("LICENSE")])
-        duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
     }
 
     java {
@@ -48,10 +36,36 @@ subprojects {
         withSourcesJar()
     }
 
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+
+    tasks.withType(Jar) {
+        from([rootProject.file("LICENSE")])
+        duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    }
+
+    javadoc {
+        options.quiet()
+        options.encoding = 'UTF-8'
+        options.jFlags("-Dfile.encoding=utf8")
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.links = [
+                "https://javadoc.io/doc/org.jetbrains/annotations/23.0.0",
+                'https://javadoc.io/doc/com.google.code.gson/gson/2.8.0',
+                'http://milkbowl.github.io/VaultAPI',
+                'https://bukkit.windit.net/javadoc'
+        ]
+    }
+
     publishing {
         publications {
             mavenJava(MavenPublication) {
-                from getProject().getComponents().java
+                var projectNameSplit = project.name.split('-')
+                artifactId = projectNameSplit[projectNameSplit.length - 1]
+                artifact jar
+                artifact sourcesJar
+//                artifact javadocJar
             }
         }
         repositories {
@@ -62,8 +76,8 @@ subprojects {
                 url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
 
                 credentials {
-                    username rootProject.getProperties().getOrDefault("maven_username", "")
-                    password rootProject.getProperties().getOrDefault("maven_password", "")
+                    username rootProject.properties.getOrDefault("maven_username", "")
+                    password rootProject.properties.getOrDefault("maven_password", "")
                 }
             }
         }
