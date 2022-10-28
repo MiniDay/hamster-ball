@@ -27,6 +27,9 @@ subprojects {
     dependencies {
         // https://mvnrepository.com/artifact/org.jetbrains/annotations
         compileOnly 'org.jetbrains:annotations:23.0.0'
+        // https://mvnrepository.com/artifact/org.projectlombok/lombok
+        compileOnly 'org.projectlombok:lombok:1.18.24'
+        annotationProcessor 'org.projectlombok:lombok:1.18.24'
     }
 
     java {
@@ -61,11 +64,9 @@ subprojects {
     publishing {
         publications {
             mavenJava(MavenPublication) {
-                var projectNameSplit = project.name.split('-')
+                def projectNameSplit = project.name.split('-')
                 artifactId = projectNameSplit[projectNameSplit.length - 1]
-                artifact jar
-                artifact sourcesJar
-//                artifact javadocJar
+                from project.components.java
             }
         }
         repositories {

@@ -8,7 +8,8 @@ dependencies {
     }
 
     compileOnly 'net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT'
-    compileOnly "cn.hamster3.mc.plugin:hamster-core-bungeecord:${hamster_core_version}"
+
+    compileOnly "cn.hamster3.mc.plugin.core:bungeecord:${hamster_core_version}"
 }
 
 processResources {

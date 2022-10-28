@@ -7,7 +7,10 @@ dependencies {
     // https://mvnrepository.com/artifact/io.netty/netty-all
     compileOnly 'io.netty:netty-all:4.1.84.Final'
 
-    compileOnly "cn.hamster3.mc.plugin:hamster-core-common:${hamster_core_version}"
+    compileOnly "cn.hamster3.mc.plugin.core:common:${hamster_core_version}"
+
+    // https://mvnrepository.com/artifact/net.kyori/adventure-api
+    compileOnly 'net.kyori:adventure-api:4.11.0'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
