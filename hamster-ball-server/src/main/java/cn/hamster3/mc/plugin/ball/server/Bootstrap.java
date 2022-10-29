@@ -2,7 +2,7 @@ package cn.hamster3.mc.plugin.ball.server;
 
 import cn.hamster3.mc.plugin.ball.server.command.CommandHandler;
 import cn.hamster3.mc.plugin.ball.server.config.ServerConfig;
-import cn.hamster3.mc.plugin.ball.server.connector.BallChannelInitializer;
+import cn.hamster3.mc.plugin.ball.server.connector.BallServerChannelInitializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -33,8 +33,7 @@ public class Bootstrap {
                 .group(loopGroup)
                 .channel(NioServerSocketChannel.class)
                 .childOption(ChannelOption.TCP_NODELAY, true)
-                .childOption(ChannelOption.SO_KEEPALIVE, true)
-                .childHandler(BallChannelInitializer.INSTANCE);
+                .childHandler(BallServerChannelInitializer.INSTANCE);
         ChannelFuture channelFuture = bootstrap.bind(ServerConfig.getHost(), ServerConfig.getPort());
         channelFuture.addListener(future -> {
             if (future.isSuccess()) {

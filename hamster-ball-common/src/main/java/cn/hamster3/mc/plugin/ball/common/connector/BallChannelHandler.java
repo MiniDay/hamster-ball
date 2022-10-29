@@ -7,18 +7,26 @@ import cn.hamster3.mc.plugin.ball.common.event.server.ServerOfflineEvent;
 import cn.hamster3.mc.plugin.ball.common.event.server.ServerOnlineEvent;
 import cn.hamster3.mc.plugin.ball.common.listener.BallListener;
 import cn.hamster3.mc.plugin.core.common.constant.CoreConstantObjects;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.jetbrains.annotations.NotNull;
 
-public class BallChannelInboundHandler extends SimpleChannelInboundHandler<String> {
-    public static final BallChannelInboundHandler INSTANCE = new BallChannelInboundHandler();
+import java.util.logging.Level;
 
-    private BallChannelInboundHandler() {
+@ChannelHandler.Sharable
+public class BallChannelHandler extends SimpleChannelInboundHandler<String> {
+    public static final BallChannelHandler INSTANCE = new BallChannelHandler();
+
+    private BallChannelHandler() {
         super(true);
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext context, String message) {
+        if ("pong".equals(message)) {
+            return;
+        }
         BallMessageInfo info = CoreConstantObjects.GSON.fromJson(message, BallMessageInfo.class);
         for (BallListener listener : BallAPI.getInstance().getListeners()) {
             try {
@@ -143,4 +151,36 @@ public class BallChannelInboundHandler extends SimpleChannelInboundHandler<Strin
             }
         }
     }
+
+    @Override
+    public void channelActive(@NotNull ChannelHandlerContext context) {
+        BallAPI.getInstance().getLogger().warning("与服务器 " + context.channel().remoteAddress() + " 的连接已可用.");
+    }
+
+    @Override
+    public void channelInactive(@NotNull ChannelHandlerContext context) {
+        context.close();
+        BallAPI.getInstance().getLogger().warning("与服务器 " + context.channel().remoteAddress() + " 的连接已断开.");
+        for (BallListener listener : BallAPI.getInstance().getListeners()) {
+            try {
+                listener.onConnectInactive();
+            } catch (Exception | Error e) {
+                e.printStackTrace();
+            }
+        }
+        BallAPI.getInstance().reconnect(5);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext context, Throwable cause) {
+        BallAPI.getInstance().getLogger().log(Level.WARNING, "与服务器 " + context.channel().remoteAddress() + " 通信时出现了一个错误: ", cause);
+        for (BallListener listener : BallAPI.getInstance().getListeners()) {
+            try {
+                listener.onConnectException(cause);
+            } catch (Exception | Error e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }

@@ -74,7 +74,6 @@ public abstract class BallAPI {
         bootstrap.group(executors)
                 .channel(NioSocketChannel.class)
                 .option(ChannelOption.TCP_NODELAY, true)
-                .option(ChannelOption.SO_KEEPALIVE, true)
                 .handler(BallChannelInitializer.INSTANCE);
 
         addListener(new BallListener() {
@@ -248,7 +247,7 @@ public abstract class BallAPI {
         }
     }
 
-    protected void reconnect(int ttl) {
+    public void reconnect(int ttl) {
         if (!enabled) {
             return;
         }
