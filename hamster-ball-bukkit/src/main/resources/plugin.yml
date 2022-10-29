@@ -1,6 +1,7 @@
 name: HamsterBall
 main: cn.hamster3.mc.plugin.ball.bukkit.HamsterBallPlugin
 version: ${version}
+api-version: 1.13
 
 author: MiniDay
 website: https://github.com/MiniDay/hamster-ball
