@@ -35,7 +35,7 @@ public class BallChannelInitializer extends ChannelInitializer<NioSocketChannel>
 
     @Override
     protected void initChannel(@NotNull NioSocketChannel channel) {
-        LOGGER.info("远程地址 {} 请求建立连接...", channel.remoteAddress().toString());
+        LOGGER.info("远程地址 {} 请求建立连接.", channel.remoteAddress().toString());
 
         String hostAddress = channel.remoteAddress().getAddress().getHostAddress();
         if (ServerConfig.isEnableAcceptList() && !ServerConfig.getAcceptList().contains(hostAddress)) {

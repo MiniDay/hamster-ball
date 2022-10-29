@@ -94,12 +94,12 @@ public final class BallDebugListener extends BallListener {
 
     @Override
     public void onServerOffline(@NotNull ServerOfflineEvent event) {
-        BallAPI.getInstance().getLogger().info("ServerOfflineEvent: " + event.getServerID());
+        BallAPI.getInstance().getLogger().info("服务器已离线: " + event.getServerID());
     }
 
     @Override
     public void onServerOnline(@NotNull ServerOnlineEvent event) {
-        BallAPI.getInstance().getLogger().info("ServerOnlineEvent: " + event.getServerInfo().getId());
+        BallAPI.getInstance().getLogger().info("服务器已上线: " + event.getServerInfo().getId());
     }
 
     @Override
