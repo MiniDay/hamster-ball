@@ -630,7 +630,7 @@ public abstract class BallAPI {
             getLogger().warning("由于服务不可用，有一条消息发送失败了: " + messageInfo);
             return;
         }
-        ChannelFuture future = channel.writeAndFlush(CoreConstantObjects.GSON.toJsonTree(messageInfo));
+        ChannelFuture future = channel.writeAndFlush(CoreConstantObjects.GSON.toJson(messageInfo));
         if (block) {
             try {
                 future.await();
