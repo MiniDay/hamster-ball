@@ -31,14 +31,14 @@ public class BallBukkitAPI extends BallAPI {
         plugin.saveDefaultConfig();
         FileConfiguration pluginConfig = plugin.getConfig();
 
-        String host = pluginConfig.getString("server-info.name.host", Bukkit.getIp());
+        String host = pluginConfig.getString("server-info.host", Bukkit.getIp());
         BallConfig config = new BallConfig(
                 new BallServerInfo(
                         pluginConfig.getString("server-info.id"),
                         pluginConfig.getString("server-info.name"),
                         BallServerType.GAME,
                         host.isEmpty() ? "127.0.0.1" : host,
-                        pluginConfig.getInt("server-info.name.port", Bukkit.getPort())
+                        pluginConfig.getInt("server-info.port", Bukkit.getPort())
                 ),
                 pluginConfig.getString("ball-server.host"),
                 pluginConfig.getInt("ball-server.port"),
