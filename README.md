@@ -1,6 +1,6 @@
 # [HamsterBall](https://github.com/MiniDay/hamster-ball)
 
-仓鼠球：一个基于 Netty 的 Minecraft 服务端通用消息中间件（原HamsterService）  
+仓鼠球：一个基于 Netty 的 Minecraft 服务端通用消息中间件（原HamsterService）
 
 该插件依赖于 [仓鼠核心](https://github.com/MiniDay/hamster-core)
 
