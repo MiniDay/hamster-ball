@@ -129,11 +129,6 @@ public abstract class BallAPI {
                 BallServerInfo info = event.getServerInfo();
                 serverInfo.put(info.getId(), info);
             }
-
-            @Override
-            public void onConnectInactive() {
-                reconnect(5);
-            }
         });
     }
 
@@ -258,7 +253,7 @@ public abstract class BallAPI {
         if (ttl <= 0) {
             for (BallListener listener : getListeners()) {
                 try {
-                    listener.onReconnectFailed();
+                    listener.onServiceDead();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

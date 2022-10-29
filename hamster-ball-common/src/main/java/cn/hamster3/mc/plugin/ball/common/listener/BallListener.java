@@ -26,13 +26,10 @@ public abstract class BallListener {
     public void onMessageSend(@NotNull BallMessageInfo event) {
     }
 
-    public void onConnectInactive() {
-    }
-
     public void onConnectException(Throwable throwable) {
     }
 
-    public void onReconnectFailed() {
+    public void onServiceDead() {
     }
 
     public void onBallPlayerPreLogin(@NotNull BallPlayerPreLoginEvent event) {

@@ -27,18 +27,13 @@ public final class BallDebugListener extends BallListener {
     }
 
     @Override
-    public void onConnectInactive() {
-        BallAPI.getInstance().getLogger().info("连接已中断！");
-    }
-
-    @Override
     public void onConnectException(Throwable throwable) {
         BallAPI.getInstance().getLogger().log(Level.INFO, "连接出现错误！", throwable);
     }
 
     @Override
-    public void onReconnectFailed() {
-        BallAPI.getInstance().getLogger().info("重新连接失败！");
+    public void onServiceDead() {
+        BallAPI.getInstance().getLogger().info("已无法建立与服务中心的连接！");
     }
 
     @Override

@@ -34,7 +34,7 @@ public class BallBukkitListener extends BallListener implements Listener {
     }
 
     @Override
-    public void onReconnectFailed() {
+    public void onServiceDead() {
         Bukkit.shutdown();
     }
 

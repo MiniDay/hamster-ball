@@ -96,7 +96,7 @@ public final class BallBungeeCordListener extends BallListener implements Listen
     }
 
     @Override
-    public void onReconnectFailed() {
+    public void onServiceDead() {
         ProxyServer.getInstance().stop("HamsterBall 重连失败.");
     }
 

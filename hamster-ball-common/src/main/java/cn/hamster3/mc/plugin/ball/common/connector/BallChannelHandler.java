@@ -154,20 +154,13 @@ public class BallChannelHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void channelActive(@NotNull ChannelHandlerContext context) {
-        BallAPI.getInstance().getLogger().warning("与服务器 " + context.channel().remoteAddress() + " 的连接已可用.");
+        BallAPI.getInstance().getLogger().info("与服务器 " + context.channel().remoteAddress() + " 建立了连接.");
     }
 
     @Override
     public void channelInactive(@NotNull ChannelHandlerContext context) {
         context.close();
         BallAPI.getInstance().getLogger().warning("与服务器 " + context.channel().remoteAddress() + " 的连接已断开.");
-        for (BallListener listener : BallAPI.getInstance().getListeners()) {
-            try {
-                listener.onConnectInactive();
-            } catch (Exception | Error e) {
-                e.printStackTrace();
-            }
-        }
         BallAPI.getInstance().reconnect(5);
     }
 

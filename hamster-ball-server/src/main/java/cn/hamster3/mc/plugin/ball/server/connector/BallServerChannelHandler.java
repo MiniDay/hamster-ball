@@ -36,7 +36,7 @@ public class BallServerChannelHandler extends SimpleChannelInboundHandler<String
 
     @Override
     public void channelActive(@NotNull ChannelHandlerContext context) {
-        LOGGER.warn("与服务器 {} 的连接已可用.", context.channel().remoteAddress());
+        LOGGER.info("与服务器 {} 建立了连接.", context.channel().remoteAddress());
     }
 
     @Override
