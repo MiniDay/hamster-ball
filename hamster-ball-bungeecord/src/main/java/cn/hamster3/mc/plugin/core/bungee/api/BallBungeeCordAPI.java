@@ -33,7 +33,7 @@ public class BallBungeeCordAPI extends BallAPI {
                 new BallServerInfo(
                         pluginConfig.getString("server-info.id"),
                         pluginConfig.getString("server-info.name"),
-                        BallServerType.GAME,
+                        BallServerType.PROXY,
                         pluginConfig.getString("server-info.host", ""),
                         pluginConfig.getInt("server-info.port", 25577)
                 ),
