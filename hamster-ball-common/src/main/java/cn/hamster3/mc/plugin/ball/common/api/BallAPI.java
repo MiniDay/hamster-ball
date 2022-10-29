@@ -227,11 +227,7 @@ public abstract class BallAPI {
 
         }
 
-        sendBallMessage(
-                BALL_CHANNEL,
-                ServerOnlineEvent.ACTION,
-                new ServerOnlineEvent(localInfo)
-        );
+        sendBallMessage(new BallMessageInfo(BALL_CHANNEL, ServerOnlineEvent.ACTION, new ServerOnlineEvent(localInfo)), true);
     }
 
     protected void connect() throws InterruptedException {
@@ -287,11 +283,7 @@ public abstract class BallAPI {
         }
         enabled = false;
 
-        sendBallMessage(
-                BALL_CHANNEL,
-                ServerOfflineEvent.ACTION,
-                new ServerOfflineEvent(getLocalServerId())
-        );
+        sendBallMessage(new BallMessageInfo(BALL_CHANNEL, ServerOfflineEvent.ACTION, new ServerOfflineEvent(getLocalServerId())), true);
 
         try (Connection connection = CoreAPI.getInstance().getConnection()) {
             PreparedStatement statement = connection.prepareStatement("DELETE FROM " + BallCommonConstants.SQL.SERVER_INFO_TABLE + " WHERE `id`=?;");
@@ -339,12 +331,16 @@ public abstract class BallAPI {
      * @param message 消息
      */
     public void broadcastPlayerMessage(@NotNull DisplayMessage message) {
-        sendBallMessage(
+        sendBallMessage(new BallMessageInfo(
                 BALL_CHANNEL,
+                getLocalServerId(),
+                null,
                 BallServerType.PROXY,
                 BroadcastPlayerMessageEvent.ACTION,
-                new BroadcastPlayerMessageEvent(message)
-        );
+                CoreConstantObjects.GSON.toJsonTree(
+                        new BroadcastPlayerMessageEvent(message)
+                )
+        ));
     }
 
     /**
@@ -355,13 +351,16 @@ public abstract class BallAPI {
      * @param command  命令内容
      */
     public void dispatchConsoleCommand(@Nullable BallServerType type, @Nullable String serverID, @NotNull String command) {
-        sendBallMessage(
+        sendBallMessage(new BallMessageInfo(
                 BALL_CHANNEL,
+                getLocalServerId(),
+                null,
                 BallServerType.GAME,
                 DispatchConsoleCommandEvent.ACTION,
-                new DispatchConsoleCommandEvent(type, serverID, command)
-
-        );
+                CoreConstantObjects.GSON.toJsonTree(
+                        new DispatchConsoleCommandEvent(type, serverID, command)
+                )
+        ));
     }
 
     /**
@@ -372,13 +371,16 @@ public abstract class BallAPI {
      * @param command 命令内容
      */
     public void dispatchPlayerCommand(@Nullable BallServerType type, @Nullable UUID uuid, @NotNull String command) {
-        sendBallMessage(
+        sendBallMessage(new BallMessageInfo(
                 BALL_CHANNEL,
+                getLocalServerId(),
+                null,
                 BallServerType.GAME,
                 DispatchPlayerCommandEvent.ACTION,
-                new DispatchPlayerCommandEvent(type, uuid, command)
-
-        );
+                CoreConstantObjects.GSON.toJsonTree(
+                        new DispatchPlayerCommandEvent(type, uuid, command)
+                )
+        ));
     }
 
     /**
@@ -398,46 +400,16 @@ public abstract class BallAPI {
      * @param reason 原因
      */
     public void kickPlayer(@NotNull UUID uuid, @NotNull Component reason) {
-        sendBallMessage(
+        sendBallMessage(new BallMessageInfo(
                 BALL_CHANNEL,
+                getLocalServerId(),
+                null,
                 BallServerType.PROXY,
                 KickPlayerEvent.ACTION,
-                new KickPlayerEvent(uuid, reason)
-
-        );
-    }
-
-    /**
-     * 给玩家发送一条消息
-     *
-     * @param uuid    玩家
-     * @param message 消息
-     * @param cache   当玩家不在线时，是否缓存消息等待玩家上线再发送
-     */
-    public void sendMessageToPlayer(@NotNull UUID uuid, @NotNull DisplayMessage message, boolean cache) {
-        BallPlayerInfo info = getPlayerInfo(uuid);
-        if (info == null || !info.isOnline()) {
-            if (!cache) {
-                return;
-            }
-            try (Connection connection = CoreAPI.getInstance().getConnection()) {
-                PreparedStatement statement = connection.prepareStatement("INSERT INTO " + BallCommonConstants.SQL.CACHED_MESSAGE_TABLE + " VALUES(?, ?);");
-                statement.setString(1, uuid.toString());
-                statement.setString(2, message.saveToJson().toString());
-                statement.executeUpdate();
-                statement.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return;
-        }
-        sendBallMessage(
-                BALL_CHANNEL,
-                BallServerType.PROXY,
-                SendMessageToPlayerEvent.ACTION,
-                new SendMessageToPlayerEvent(Collections.singleton(uuid), message)
-
-        );
+                CoreConstantObjects.GSON.toJsonTree(
+                        new KickPlayerEvent(uuid, reason)
+                )
+        ));
     }
 
     /**
@@ -447,31 +419,70 @@ public abstract class BallAPI {
      * @param message  消息
      * @param cache    当玩家不在线时，是否缓存消息等待玩家上线再发送
      */
-    public void sendMessageToPlayer(@NotNull Set<UUID> receiver, @NotNull DisplayMessage message, boolean cache) {
-        for (UUID uuid : receiver) {
-            BallPlayerInfo info = getPlayerInfo(uuid);
-            if (info == null || !info.isOnline()) {
-                if (!cache) {
-                    return;
+    public void sendMessageToPlayer(@NotNull UUID receiver, @NotNull DisplayMessage message, boolean cache) {
+        BallPlayerInfo info = getPlayerInfo(receiver);
+        if (info == null || !info.isOnline()) {
+            if (!cache) {
+                return;
+            }
+            try (Connection connection = CoreAPI.getInstance().getConnection()) {
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO " + BallCommonConstants.SQL.CACHED_MESSAGE_TABLE + " VALUES(?, ?);");
+                statement.setString(1, receiver.toString());
+                statement.setString(2, message.saveToJson().toString());
+                statement.executeUpdate();
+                statement.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+        sendBallMessage(new BallMessageInfo(
+                BALL_CHANNEL,
+                getLocalServerId(),
+                null,
+                BallServerType.PROXY,
+                SendMessageToPlayerEvent.ACTION,
+                CoreConstantObjects.GSON.toJsonTree(
+                        new SendMessageToPlayerEvent(Collections.singleton(receiver), message)
+                )
+        ));
+    }
+
+    /**
+     * 给玩家发送一条消息
+     *
+     * @param receivers 玩家
+     * @param message   消息
+     * @param cache     当玩家不在线时，是否缓存消息等待玩家上线再发送
+     */
+    public void sendMessageToPlayer(@NotNull Collection<UUID> receivers, @NotNull DisplayMessage message, boolean cache) {
+        if (cache) {
+            for (UUID receiver : receivers) {
+                BallPlayerInfo info = getPlayerInfo(receiver);
+                if (info != null && info.isOnline()) {
+                    continue;
                 }
                 try (Connection connection = CoreAPI.getInstance().getConnection()) {
                     PreparedStatement statement = connection.prepareStatement("INSERT INTO " + BallCommonConstants.SQL.CACHED_MESSAGE_TABLE + " VALUES(?, ?);");
-                    statement.setString(1, uuid.toString());
+                    statement.setString(1, receiver.toString());
                     statement.setString(2, message.saveToJson().toString());
                     statement.executeUpdate();
                     statement.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                return;
             }
         }
-        sendBallMessage(
+        sendBallMessage(new BallMessageInfo(
                 BALL_CHANNEL,
+                getLocalServerId(),
+                null,
                 BallServerType.PROXY,
                 SendMessageToPlayerEvent.ACTION,
-                new SendMessageToPlayerEvent(receiver, message)
-        );
+                CoreConstantObjects.GSON.toJsonTree(
+                        new SendMessageToPlayerEvent(new HashSet<>(receivers), message)
+                )
+        ));
     }
 
     /**
@@ -504,11 +515,11 @@ public abstract class BallAPI {
      * @param location       坐标
      * @param doneMessage    传送完成后显示的消息
      */
-    public void sendPlayerToLocation(@NotNull HashSet<UUID> sendPlayerUUID, @NotNull BallLocation location, @Nullable DisplayMessage doneMessage) {
+    public void sendPlayerToLocation(@NotNull Collection<UUID> sendPlayerUUID, @NotNull BallLocation location, @Nullable DisplayMessage doneMessage) {
         sendBallMessage(
                 BALL_CHANNEL,
                 SendPlayerToLocationEvent.ACTION,
-                new SendPlayerToLocationEvent(sendPlayerUUID, location, doneMessage)
+                new SendPlayerToLocationEvent(new HashSet<>(sendPlayerUUID), location, doneMessage)
         );
     }
 
@@ -517,14 +528,14 @@ public abstract class BallAPI {
      * <p>
      * 支持跨服传送
      *
-     * @param sendPlayerUUID 被传送的玩家
-     * @param toPlayerUUID   传送的目标玩家
+     * @param sendPlayer 被传送的玩家
+     * @param toPlayer   传送的目标玩家
      */
-    public void sendPlayerToPlayer(@NotNull UUID sendPlayerUUID, @NotNull UUID toPlayerUUID, @Nullable DisplayMessage doneMessage, @Nullable DisplayMessage doneTargetMessage) {
+    public void sendPlayerToPlayer(@NotNull UUID sendPlayer, @NotNull UUID toPlayer, @Nullable DisplayMessage doneMessage, @Nullable DisplayMessage doneTargetMessage) {
         sendBallMessage(
                 BALL_CHANNEL,
                 SendPlayerToPlayerEvent.ACTION,
-                new SendPlayerToPlayerEvent(Collections.singleton(sendPlayerUUID), toPlayerUUID, doneMessage, doneTargetMessage)
+                new SendPlayerToPlayerEvent(Collections.singleton(sendPlayer), toPlayer, doneMessage, doneTargetMessage)
         );
     }
 
@@ -534,14 +545,14 @@ public abstract class BallAPI {
      * 支持跨服传送
      *
      * @param sendPlayerUUID 被传送的玩家
-     * @param toPlayerUUID   传送的目标玩家
+     * @param toPlayer       传送的目标玩家
      * @param doneMessage    传送完成后显示的消息
      */
-    public void sendPlayerToPlayer(@NotNull HashSet<UUID> sendPlayerUUID, @NotNull UUID toPlayerUUID, @Nullable DisplayMessage doneMessage, @Nullable DisplayMessage doneTargetMessage) {
+    public void sendPlayerToPlayer(@NotNull Collection<UUID> sendPlayerUUID, @NotNull UUID toPlayer, @Nullable DisplayMessage doneMessage, @Nullable DisplayMessage doneTargetMessage) {
         sendBallMessage(
                 BALL_CHANNEL,
                 SendPlayerToPlayerEvent.ACTION,
-                new SendPlayerToPlayerEvent(sendPlayerUUID, toPlayerUUID, doneMessage, doneTargetMessage)
+                new SendPlayerToPlayerEvent(new HashSet<>(sendPlayerUUID), toPlayer, doneMessage, doneTargetMessage)
         );
     }
 
@@ -552,7 +563,7 @@ public abstract class BallAPI {
      * @param action  执行动作
      */
     public void sendBallMessage(@NotNull String channel, @NotNull String action) {
-        sendBallMessage(new BallMessageInfo(channel, getLocalServerId(), null, null, action, null));
+        sendBallMessage(new BallMessageInfo(channel, action));
     }
 
     /**
@@ -563,7 +574,7 @@ public abstract class BallAPI {
      * @param content 附加参数
      */
     public void sendBallMessage(@NotNull String channel, @NotNull String action, @NotNull String content) {
-        sendBallMessage(new BallMessageInfo(channel, getLocalServerId(), null, null, action, new JsonPrimitive(content)));
+        sendBallMessage(new BallMessageInfo(channel, action, new JsonPrimitive(content)));
     }
 
     /**
@@ -574,7 +585,7 @@ public abstract class BallAPI {
      * @param content 附加参数
      */
     public void sendBallMessage(@NotNull String channel, @NotNull String action, @NotNull JsonElement content) {
-        sendBallMessage(new BallMessageInfo(channel, getLocalServerId(), null, null, action, content));
+        sendBallMessage(new BallMessageInfo(channel, action, content));
     }
 
     /**
@@ -585,29 +596,7 @@ public abstract class BallAPI {
      * @param content 附加参数
      */
     public void sendBallMessage(@NotNull String channel, @NotNull String action, @NotNull Object content) {
-        sendBallMessage(new BallMessageInfo(channel, getLocalServerId(), null, null, action, CoreConstantObjects.GSON.toJsonTree(content)));
-    }
-
-    /**
-     * 发送一条有附加参数的消息
-     *
-     * @param channel 消息频道
-     * @param action  执行动作
-     * @param content 附加参数
-     */
-    public void sendBallMessage(@NotNull String channel, @Nullable BallServerType receiverType, @NotNull String action, @NotNull JsonElement content) {
-        sendBallMessage(new BallMessageInfo(channel, getLocalServerId(), null, receiverType, action, content));
-    }
-
-    /**
-     * 发送一条有附加参数的服务消息
-     *
-     * @param channel 消息标签
-     * @param action  执行动作
-     * @param content 附加参数
-     */
-    public void sendBallMessage(@NotNull String channel, @Nullable BallServerType receiverType, @NotNull String action, @NotNull Object content) {
-        sendBallMessage(new BallMessageInfo(channel, getLocalServerId(), null, receiverType, action, CoreConstantObjects.GSON.toJsonTree(content)));
+        sendBallMessage(new BallMessageInfo(channel, action, content));
     }
 
     /**

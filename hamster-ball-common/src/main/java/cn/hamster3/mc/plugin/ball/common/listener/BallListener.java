@@ -20,6 +20,12 @@ public abstract class BallListener {
     public void onConnectActive() {
     }
 
+    public void onMessageReceived(@NotNull BallMessageInfo event) {
+    }
+
+    public void onMessageSend(@NotNull BallMessageInfo event) {
+    }
+
     public void onConnectInactive() {
     }
 
@@ -53,16 +59,10 @@ public abstract class BallListener {
     public void onBallPlayerChat(@NotNull BallPlayerChatEvent event) {
     }
 
-    public void onServerOffline(@NotNull ServerOfflineEvent event) {
-    }
-
     public void onServerOnline(@NotNull ServerOnlineEvent event) {
     }
 
-    public void onMessageSend(@NotNull BallMessageInfo event) {
-    }
-
-    public void onMessageReceived(@NotNull BallMessageInfo event) {
+    public void onServerOffline(@NotNull ServerOfflineEvent event) {
     }
 
 }

@@ -14,7 +14,7 @@ public class SendMessageToPlayerEvent {
     public static final String ACTION = "SendMessageToPlayer";
 
     @NotNull
-    private final Set<UUID> receiver;
+    private final Set<UUID> receivers;
     @NotNull
     private final DisplayMessage message;
 }

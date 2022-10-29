@@ -1,13 +1,13 @@
 package cn.hamster3.mc.plugin.ball.common.data;
 
+import cn.hamster3.mc.plugin.ball.common.api.BallAPI;
 import cn.hamster3.mc.plugin.ball.common.entity.BallServerType;
 import cn.hamster3.mc.plugin.core.common.constant.CoreConstantObjects;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import lombok.AllArgsConstructor;
+import com.google.gson.JsonPrimitive;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,8 +19,6 @@ import java.util.UUID;
  * 服务消息
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @SuppressWarnings("unused")
 public class BallMessageInfo {
     /**
@@ -63,6 +61,42 @@ public class BallMessageInfo {
      * 这里是消息的附加参数
      */
     private JsonElement content;
+
+    public BallMessageInfo(@NotNull String channel, String action) {
+        this.channel = channel;
+        senderID = BallAPI.getInstance().getLocalServerId();
+        this.action = action;
+    }
+
+    public BallMessageInfo(@NotNull String channel, String action, String content) {
+        this.channel = channel;
+        senderID = BallAPI.getInstance().getLocalServerId();
+        this.action = action;
+        this.content = new JsonPrimitive(content);
+    }
+
+    public BallMessageInfo(@NotNull String channel, String action, JsonElement content) {
+        this.channel = channel;
+        senderID = BallAPI.getInstance().getLocalServerId();
+        this.action = action;
+        this.content = content;
+    }
+
+    public BallMessageInfo(@NotNull String channel, String action, Object content) {
+        this.channel = channel;
+        senderID = BallAPI.getInstance().getLocalServerId();
+        this.action = action;
+        this.content = CoreConstantObjects.GSON.toJsonTree(content);
+    }
+
+    public BallMessageInfo(@NotNull String channel, @NotNull String senderID, @Nullable String receiverID, @Nullable BallServerType receiverType, String action, JsonElement content) {
+        this.channel = channel;
+        this.senderID = senderID;
+        this.receiverID = receiverID;
+        this.receiverType = receiverType;
+        this.action = action;
+        this.content = content;
+    }
 
     /**
      * 序列化至 Json
