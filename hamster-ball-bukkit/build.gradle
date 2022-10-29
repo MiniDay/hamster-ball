@@ -3,9 +3,7 @@ setArchivesBaseName("HamsterBall-Bukkit")
 evaluationDependsOn(':hamster-ball-common')
 
 dependencies {
-    apiShade(project(":hamster-ball-common")) {
-        exclude group: "*"
-    }
+    apiShade(project(":hamster-ball-common")) { transitive = false }
 
     compileOnly 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
 

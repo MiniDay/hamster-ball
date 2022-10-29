@@ -3,9 +3,7 @@ setArchivesBaseName("HamsterBall-BungeeCord")
 evaluationDependsOn(':hamster-ball-common')
 
 dependencies {
-    apiShade(project(":hamster-ball-common")) {
-        exclude group: "*"
-    }
+    apiShade(project(":hamster-ball-common")) { transitive = false }
 
     compileOnly 'net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT'
 

@@ -3,9 +3,7 @@ setArchivesBaseName("HamsterBall-Server")
 evaluationDependsOn(':hamster-ball-common')
 
 dependencies {
-    apiShade(project(":hamster-ball-common")) {
-        exclude group: "*"
-    }
+    apiShade(project(":hamster-ball-common")) { transitive = false }
 
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
     implementation 'org.slf4j:slf4j-api:2.0.3'
@@ -20,7 +18,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
     implementationShade 'org.yaml:snakeyaml:1.33'
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
-    implementation 'com.google.code.gson:gson:2.9.1'
+    implementationShade 'com.google.code.gson:gson:2.10'
 
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
