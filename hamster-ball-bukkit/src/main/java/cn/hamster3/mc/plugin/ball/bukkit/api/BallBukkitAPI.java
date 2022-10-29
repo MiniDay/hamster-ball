@@ -6,11 +6,13 @@ import cn.hamster3.mc.plugin.ball.common.api.BallAPI;
 import cn.hamster3.mc.plugin.ball.common.config.BallConfig;
 import cn.hamster3.mc.plugin.ball.common.entity.BallServerInfo;
 import cn.hamster3.mc.plugin.ball.common.entity.BallServerType;
+import cn.hamster3.mc.plugin.ball.common.listener.BallDebugListener;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
+import java.util.logging.Logger;
 
 public class BallBukkitAPI extends BallAPI {
     public BallBukkitAPI(@NotNull BallConfig config) {
@@ -45,6 +47,9 @@ public class BallBukkitAPI extends BallAPI {
         instance = new BallBukkitAPI(config);
 
         instance.addListener(BallBukkitListener.INSTANCE);
+        if (pluginConfig.getBoolean("debug", false)) {
+            instance.addListener(BallDebugListener.INSTANCE);
+        }
     }
 
     @Override
@@ -55,5 +60,10 @@ public class BallBukkitAPI extends BallAPI {
     @Override
     public void disable() throws SQLException, InterruptedException {
         super.disable();
+    }
+
+    @Override
+    public @NotNull Logger getLogger() {
+        return HamsterBallPlugin.getInstance().getLogger();
     }
 }

@@ -1,3 +1,6 @@
+# 是否允许在控制台输出调试信息
+debug: false
+
 ball-server:
   host: "ball.hamster3.cn"
   port: 58888

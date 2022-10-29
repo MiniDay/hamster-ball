@@ -33,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
 public abstract class BallAPI {
@@ -57,11 +58,12 @@ public abstract class BallAPI {
     private final Bootstrap bootstrap;
     private final NioEventLoopGroup executors;
 
-    protected boolean enable;
+    protected boolean enabled;
     protected Channel channel;
 
     protected BallAPI(@NotNull BallConfig config) {
         this.config = config;
+        this.enabled = false;
         executors = new NioEventLoopGroup(config.getNioThread());
 
         serverInfo = new ConcurrentHashMap<>();
@@ -146,10 +148,10 @@ public abstract class BallAPI {
     }
 
     protected void enable() throws SQLException, InterruptedException {
-        if (enable) {
+        if (enabled) {
             return;
         }
-        enable = true;
+        enabled = true;
         BallServerInfo localInfo = getLocalServerInfo();
 
         connect();
@@ -233,20 +235,25 @@ public abstract class BallAPI {
     }
 
     protected void connect() throws InterruptedException {
-        if (!enable) {
+        if (!enabled) {
+            getLogger().info("仓鼠球已关闭，拒绝启动连接！");
             return;
         }
+        getLogger().info("准备连接至仓鼠球服务中心！");
         ChannelFuture future = bootstrap.connect(config.getHost(), config.getPort()).await();
         if (future.isSuccess()) {
             channel = future.channel();
             for (BallListener listener : listeners) {
                 listener.onConnectActive();
             }
+            getLogger().info("已连接至仓鼠球服务中心！");
+        } else {
+            getLogger().warning("连接至仓鼠球服务中心失败！");
         }
     }
 
     protected void reconnect(int ttl) {
-        if (!enable) {
+        if (!enabled) {
             return;
         }
         if (channel != null && channel.isOpen() && channel.isRegistered() && channel.isActive() && channel.isWritable()) {
@@ -275,10 +282,10 @@ public abstract class BallAPI {
     }
 
     protected void disable() throws SQLException, InterruptedException {
-        if (!enable) {
+        if (!enabled) {
             return;
         }
-        enable = false;
+        enabled = false;
 
         sendBallMessage(
                 BALL_CHANNEL,
@@ -620,9 +627,10 @@ public abstract class BallAPI {
      */
     public void sendBallMessage(@NotNull BallMessageInfo messageInfo, boolean block) {
         if (channel == null || !channel.isWritable()) {
+            getLogger().warning("由于服务不可用，有一条消息发送失败了: " + messageInfo);
             return;
         }
-        ChannelFuture future = channel.write(CoreConstantObjects.GSON.toJsonTree(messageInfo));
+        ChannelFuture future = channel.writeAndFlush(CoreConstantObjects.GSON.toJsonTree(messageInfo));
         if (block) {
             try {
                 future.await();
@@ -752,4 +760,7 @@ public abstract class BallAPI {
     public List<BallListener> getListeners() {
         return listeners;
     }
+
+    @NotNull
+    public abstract Logger getLogger();
 }
