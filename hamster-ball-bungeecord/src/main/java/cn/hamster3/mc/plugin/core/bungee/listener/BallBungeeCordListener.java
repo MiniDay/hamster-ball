@@ -3,10 +3,14 @@ package cn.hamster3.mc.plugin.core.bungee.listener;
 import cn.hamster3.mc.plugin.ball.common.api.BallAPI;
 import cn.hamster3.mc.plugin.ball.common.data.BallMessageInfo;
 import cn.hamster3.mc.plugin.ball.common.entity.BallPlayerInfo;
+import cn.hamster3.mc.plugin.ball.common.entity.BallServerInfo;
 import cn.hamster3.mc.plugin.ball.common.entity.BallServerType;
 import cn.hamster3.mc.plugin.ball.common.event.operate.*;
 import cn.hamster3.mc.plugin.ball.common.event.player.*;
+import cn.hamster3.mc.plugin.ball.common.event.server.ServerOfflineEvent;
+import cn.hamster3.mc.plugin.ball.common.event.server.ServerOnlineEvent;
 import cn.hamster3.mc.plugin.ball.common.listener.BallListener;
+import cn.hamster3.mc.plugin.core.bungee.HamsterBallPlugin;
 import cn.hamster3.mc.plugin.core.bungee.util.BallBungeeCordUtils;
 import cn.hamster3.mc.plugin.core.common.api.CoreAPI;
 import cn.hamster3.mc.plugin.core.common.constant.CoreConstantObjects;
@@ -15,6 +19,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
@@ -22,17 +27,13 @@ import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
 import java.util.UUID;
 
 public final class BallBungeeCordListener extends BallListener implements Listener {
     public static final BallBungeeCordListener INSTANCE = new BallBungeeCordListener();
 
     private BallBungeeCordListener() {
-    }
-
-    @Override
-    public void onReconnectFailed() {
-        ProxyServer.getInstance().stop();
     }
 
     @Override
@@ -85,12 +86,35 @@ public final class BallBungeeCordListener extends BallListener implements Listen
             }
             case SendMessageToPlayerEvent.ACTION: {
                 SendMessageToPlayerEvent event = CoreConstantObjects.GSON.fromJson(info.getContent(), SendMessageToPlayerEvent.class);
-                for (UUID uuid : event.getReceiver()) {
-                    Audience audience = CoreAPI.getInstance().getAudienceProvider().player(uuid);
+                for (UUID receiver : event.getReceivers()) {
+                    Audience audience = CoreAPI.getInstance().getAudienceProvider().player(receiver);
                     event.getMessage().show(audience);
                 }
                 break;
             }
+        }
+    }
+
+    @Override
+    public void onReconnectFailed() {
+        ProxyServer.getInstance().stop("HamsterBall 重连失败.");
+    }
+
+    @Override
+    public void onServerOnline(@NotNull ServerOnlineEvent event) {
+        BallServerInfo serverInfo = event.getServerInfo();
+        if (serverInfo.getType() != BallServerType.GAME) {
+            return;
+        }
+        ProxyServer.getInstance().getServers().put(serverInfo.getId(), BallBungeeCordUtils.getServerInfo(serverInfo));
+        HamsterBallPlugin.getInstance().getLogger().info("已添加子服 " + serverInfo.getId() + " 的接入点配置.");
+    }
+
+    @Override
+    public void onServerOffline(@NotNull ServerOfflineEvent event) {
+        Map<String, ServerInfo> map = ProxyServer.getInstance().getServers();
+        if (map.remove(event.getServerID()) != null) {
+            HamsterBallPlugin.getInstance().getLogger().info("已移除子服 " + event.getServerID() + " 的接入点配置.");
         }
     }
 
