@@ -1,6 +1,7 @@
 package cn.hamster3.mc.plugin.core.bungee.listener;
 
 import cn.hamster3.mc.plugin.ball.common.api.BallAPI;
+import cn.hamster3.mc.plugin.ball.common.constant.BallCommonConstants;
 import cn.hamster3.mc.plugin.ball.common.data.BallMessageInfo;
 import cn.hamster3.mc.plugin.ball.common.entity.BallPlayerInfo;
 import cn.hamster3.mc.plugin.ball.common.entity.BallServerInfo;
@@ -27,6 +28,9 @@ import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -148,11 +152,13 @@ public final class BallBungeeCordListener extends BallListener implements Listen
     @EventHandler(priority = EventPriority.HIGH)
     public void onPostLogin(PostLoginEvent event) {
         ProxiedPlayer player = event.getPlayer();
+        BallPlayerInfo playerInfo = BallBungeeCordUtils.getPlayerInfo(player, true);
         BallAPI.getInstance().sendBallMessage(
                 BallAPI.BALL_CHANNEL,
                 BallPlayerPostLoginEvent.ACTION,
-                new BallPlayerPostLoginEvent(BallBungeeCordUtils.getPlayerInfo(player, true))
+                new BallPlayerPostLoginEvent(playerInfo)
         );
+        uploadPlayerInfo(playerInfo);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -164,6 +170,7 @@ public final class BallBungeeCordListener extends BallListener implements Listen
                 BallPlayerConnectServerEvent.ACTION,
                 new BallPlayerConnectServerEvent(playerInfo, playerInfo.getGameServer(), event.getTarget().getName())
         );
+        uploadPlayerInfo(playerInfo);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -175,6 +182,7 @@ public final class BallBungeeCordListener extends BallListener implements Listen
                 BallPlayerPostConnectServerEvent.ACTION,
                 new BallPlayerPostConnectServerEvent(playerInfo)
         );
+        uploadPlayerInfo(playerInfo);
     }
 
     @EventHandler
@@ -188,10 +196,29 @@ public final class BallBungeeCordListener extends BallListener implements Listen
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerDisconnect(PlayerDisconnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
+        BallPlayerInfo playerInfo = BallBungeeCordUtils.getPlayerInfo(player, false);
         BallAPI.getInstance().sendBallMessage(
                 BallAPI.BALL_CHANNEL,
                 BallPlayerLogoutEvent.ACTION,
-                new BallPlayerLogoutEvent(BallBungeeCordUtils.getPlayerInfo(player, false))
+                new BallPlayerLogoutEvent(playerInfo)
         );
+        uploadPlayerInfo(playerInfo);
+    }
+
+    private void uploadPlayerInfo(BallPlayerInfo playerInfo) {
+        ProxyServer.getInstance().getScheduler().runAsync(HamsterBallPlugin.getInstance(), () -> {
+            try (Connection connection = CoreAPI.getInstance().getConnection()) {
+                PreparedStatement statement = connection.prepareStatement("REPLACE INTO " + BallCommonConstants.SQL.PLAYER_INFO_TABLE + " VALUES(?, ?, ?, ?, ?);");
+                statement.setString(1, playerInfo.getUuid().toString());
+                statement.setString(2, playerInfo.getName());
+                statement.setString(3, playerInfo.getGameServer());
+                statement.setString(4, playerInfo.getProxyServer());
+                statement.setBoolean(5, playerInfo.isOnline());
+                statement.executeUpdate();
+                statement.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
     }
 }
