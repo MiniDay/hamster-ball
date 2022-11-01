@@ -40,7 +40,7 @@ subprojects {
     }
 
     tasks.withType(JavaCompile) {
-        options.encoding = 'UTF-8'
+        options.setEncoding("UTF-8")
     }
 
     tasks.withType(Jar) {
@@ -50,7 +50,7 @@ subprojects {
 
     javadoc {
         options.quiet()
-        options.encoding = 'UTF-8'
+        options.setEncoding("UTF-8")
         options.jFlags("-Dfile.encoding=utf8")
         options.addStringOption('Xdoclint:none', '-quiet')
         options.links = [

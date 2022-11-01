@@ -14,7 +14,7 @@ dependencies {
     shade 'org.apache.logging.log4j:log4j-slf4j-impl:2.19.0'
 
     // https://mvnrepository.com/artifact/io.netty/netty-all
-    implementationShade 'io.netty:netty-all:4.1.84.Final'
+    implementationShade 'io.netty:netty-all:4.1.82.Final'
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
     implementationShade 'org.yaml:snakeyaml:1.33'
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
