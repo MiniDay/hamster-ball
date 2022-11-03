@@ -1,7 +1,6 @@
 package cn.hamster3.mc.plugin.core.bungee.listener;
 
 import cn.hamster3.mc.plugin.ball.common.api.BallAPI;
-import cn.hamster3.mc.plugin.ball.common.constant.BallCommonConstants;
 import cn.hamster3.mc.plugin.ball.common.data.BallMessageInfo;
 import cn.hamster3.mc.plugin.ball.common.entity.BallPlayerInfo;
 import cn.hamster3.mc.plugin.ball.common.entity.BallServerInfo;
@@ -208,7 +207,7 @@ public final class BallBungeeCordListener extends BallListener implements Listen
     private void uploadPlayerInfo(BallPlayerInfo playerInfo) {
         ProxyServer.getInstance().getScheduler().runAsync(HamsterBallPlugin.getInstance(), () -> {
             try (Connection connection = CoreAPI.getInstance().getConnection()) {
-                PreparedStatement statement = connection.prepareStatement("REPLACE INTO " + BallCommonConstants.SQL.PLAYER_INFO_TABLE + " VALUES(?, ?, ?, ?, ?);");
+                PreparedStatement statement = connection.prepareStatement("REPLACE INTO `hamster_ball_player_info` VALUES(?, ?, ?, ?, ?);");
                 statement.setString(1, playerInfo.getUuid().toString());
                 statement.setString(2, playerInfo.getName());
                 statement.setString(3, playerInfo.getGameServer());

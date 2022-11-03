@@ -2,7 +2,6 @@ package cn.hamster3.mc.plugin.ball.common.api;
 
 import cn.hamster3.mc.plugin.ball.common.config.BallConfig;
 import cn.hamster3.mc.plugin.ball.common.connector.BallChannelInitializer;
-import cn.hamster3.mc.plugin.ball.common.constant.BallCommonConstants;
 import cn.hamster3.mc.plugin.ball.common.data.BallLocation;
 import cn.hamster3.mc.plugin.ball.common.data.BallMessageInfo;
 import cn.hamster3.mc.plugin.ball.common.entity.BallPlayerInfo;
@@ -155,30 +154,31 @@ public abstract class BallAPI {
 
             {
                 Statement statement = connection.createStatement();
-                statement.execute("CREATE TABLE IF NOT EXISTS " + BallCommonConstants.SQL.PLAYER_INFO_TABLE + "(" +
+                statement.execute("CREATE TABLE IF NOT EXISTS `hamster_ball_player_info`(" +
                         "`uuid` CHAR(36) PRIMARY KEY," +
                         "`name` VARCHAR(16) NOT NULL," +
                         "`game_server` VARCHAR(32) NOT NULL," +
                         "`proxy_server` VARCHAR(32) NOT NULL," +
                         "`online` BOOLEAN NOT NULL" +
                         ") CHARSET utf8mb4;");
-                statement.execute("CREATE TABLE IF NOT EXISTS " + BallCommonConstants.SQL.SERVER_INFO_TABLE + "(" +
+                statement.execute("CREATE TABLE IF NOT EXISTS `hamster_ball_server_info`(" +
                         "`id` VARCHAR(32) PRIMARY KEY NOT NULL," +
                         "`name` VARCHAR(32) NOT NULL," +
                         "`type` VARCHAR(16) NOT NULL," +
                         "`host` VARCHAR(32) NOT NULL," +
                         "`port` INT NOT NULL" +
                         ") CHARSET utf8mb4;");
-                statement.execute("CREATE TABLE IF NOT EXISTS " + BallCommonConstants.SQL.CACHED_MESSAGE_TABLE + "(" +
+                statement.execute("CREATE TABLE IF NOT EXISTS `hamster_ball_cached_message`(" +
                         "`uuid` CHAR(36) NOT NULL," +
                         "`message` TEXT NOT NULL," +
-                        "CONSTRAINT `fk_uuid` FOREIGN KEY (`uuid`) REFERENCES " + BallCommonConstants.SQL.PLAYER_INFO_TABLE + "(`uuid`) ON DELETE CASCADE ON UPDATE CASCADE" +
+                        "CONSTRAINT `fk_uuid_ball` FOREIGN KEY (`uuid`) REFERENCES `hamster_ball_player_info`(`uuid`) " +
+                        "ON DELETE CASCADE ON UPDATE CASCADE" +
                         ") CHARSET utf8mb4;");
                 statement.close();
             }
 
             {
-                PreparedStatement statement = connection.prepareStatement("REPLACE INTO " + BallCommonConstants.SQL.SERVER_INFO_TABLE + " VALUES(?, ?, ?, ?, ?);");
+                PreparedStatement statement = connection.prepareStatement("REPLACE INTO `hamster_ball_server_info` VALUES(?, ?, ?, ?, ?);");
                 statement.setString(1, localInfo.getId());
                 statement.setString(2, localInfo.getName());
                 statement.setString(3, localInfo.getType().name());
@@ -189,7 +189,7 @@ public abstract class BallAPI {
             }
 
             {
-                PreparedStatement statement = connection.prepareStatement("SELECT * FROM " + BallCommonConstants.SQL.SERVER_INFO_TABLE + ";");
+                PreparedStatement statement = connection.prepareStatement("SELECT * FROM `hamster_ball_server_info`;");
                 ResultSet set = statement.executeQuery();
                 while (set.next()) {
                     String serverID = set.getString("id");
@@ -206,7 +206,7 @@ public abstract class BallAPI {
             }
 
             {
-                PreparedStatement statement = connection.prepareStatement("SELECT * FROM " + BallCommonConstants.SQL.PLAYER_INFO_TABLE + ";");
+                PreparedStatement statement = connection.prepareStatement("SELECT * FROM `hamster_ball_player_info`;");
                 ResultSet set = statement.executeQuery();
                 while (set.next()) {
                     UUID uuid = UUID.fromString(set.getString("uuid"));
@@ -282,7 +282,7 @@ public abstract class BallAPI {
         sendBallMessage(new BallMessageInfo(BALL_CHANNEL, ServerOfflineEvent.ACTION, new ServerOfflineEvent(getLocalServerId())), true);
 
         try (Connection connection = CoreAPI.getInstance().getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM " + BallCommonConstants.SQL.SERVER_INFO_TABLE + " WHERE `id`=?;");
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM `hamster_ball_server_info` WHERE `id`=?;");
             statement.setString(1, getLocalServerId());
             statement.executeUpdate();
             statement.close();
@@ -422,7 +422,7 @@ public abstract class BallAPI {
                 return;
             }
             try (Connection connection = CoreAPI.getInstance().getConnection()) {
-                PreparedStatement statement = connection.prepareStatement("INSERT INTO " + BallCommonConstants.SQL.CACHED_MESSAGE_TABLE + " VALUES(?, ?);");
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO `hamster_ball_cached_message` VALUES(?, ?);");
                 statement.setString(1, receiver.toString());
                 statement.setString(2, message.saveToJson().toString());
                 statement.executeUpdate();
@@ -459,7 +459,7 @@ public abstract class BallAPI {
                     continue;
                 }
                 try (Connection connection = CoreAPI.getInstance().getConnection()) {
-                    PreparedStatement statement = connection.prepareStatement("INSERT INTO " + BallCommonConstants.SQL.CACHED_MESSAGE_TABLE + " VALUES(?, ?);");
+                    PreparedStatement statement = connection.prepareStatement("INSERT INTO `hamster_ball_cached_message` VALUES(?, ?);");
                     statement.setString(1, receiver.toString());
                     statement.setString(2, message.saveToJson().toString());
                     statement.executeUpdate();
@@ -636,7 +636,7 @@ public abstract class BallAPI {
     public List<DisplayMessage> getCachedPlayerMessage(@NotNull UUID uuid) throws SQLException {
         ArrayList<DisplayMessage> list = new ArrayList<>();
         try (Connection connection = CoreAPI.getInstance().getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("SELECT message FROM " + BallCommonConstants.SQL.CACHED_MESSAGE_TABLE + " WHERE `uuid`=?;");
+            PreparedStatement statement = connection.prepareStatement("SELECT message FROM `hamster_ball_cached_message` WHERE `uuid`=?;");
             statement.setString(1, uuid.toString());
             ResultSet set = statement.executeQuery();
             while (set.next()) {
@@ -650,7 +650,7 @@ public abstract class BallAPI {
 
     public void removeCachedPlayerMessage(@NotNull UUID uuid) throws SQLException {
         try (Connection connection = CoreAPI.getInstance().getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM " + BallCommonConstants.SQL.CACHED_MESSAGE_TABLE + " WHERE `uuid`=?;");
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM `hamster_ball_cached_message` WHERE `uuid`=?;");
             statement.setString(1, uuid.toString());
             statement.executeUpdate();
             statement.close();
