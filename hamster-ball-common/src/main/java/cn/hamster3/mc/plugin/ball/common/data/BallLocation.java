@@ -1,5 +1,7 @@
 package cn.hamster3.mc.plugin.ball.common.data;
 
+import cn.hamster3.mc.plugin.core.common.constant.CoreConstantObjects;
+import com.google.gson.JsonElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +21,19 @@ public class BallLocation {
     private float yaw;
     private float pitch;
 
+    public static BallLocation fromJson(String json) {
+        return CoreConstantObjects.GSON.fromJson(json, BallLocation.class);
+    }
+
+    public JsonElement toJson() {
+        return CoreConstantObjects.GSON.toJsonTree(this);
+    }
+
+    @NotNull
+    public BallBlockPos toServiceBlockPos() {
+        return new BallBlockPos(getServerID(), getWorldName(), getBlockX(), getBlockY(), getBlockZ());
+    }
+
     public int getBlockX() {
         return (int) x;
     }
@@ -29,10 +44,5 @@ public class BallLocation {
 
     public int getBlockZ() {
         return (int) z;
-    }
-
-    @NotNull
-    public BallBlockPos toServiceBlockPos() {
-        return new BallBlockPos(getServerID(), getWorldName(), getBlockX(), getBlockY(), getBlockZ());
     }
 }

@@ -2,6 +2,7 @@ package cn.hamster3.mc.plugin.ball.bukkit.data;
 
 import cn.hamster3.mc.plugin.ball.common.api.BallAPI;
 import cn.hamster3.mc.plugin.ball.common.data.BallLocation;
+import cn.hamster3.mc.plugin.core.common.constant.CoreConstantObjects;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -48,6 +49,10 @@ public class BukkitLocation extends BallLocation {
                 location.getYaw(),
                 location.getPitch()
         );
+    }
+
+    public static BukkitLocation fromJson(String json) {
+        return CoreConstantObjects.GSON.fromJson(json, BukkitLocation.class);
     }
 
     @NotNull
