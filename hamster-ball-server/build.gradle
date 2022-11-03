@@ -18,7 +18,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
     implementationShade 'org.yaml:snakeyaml:1.33'
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
-    implementationShade 'com.google.code.gson:gson:2.10'
+    implementationShade 'com.google.code.gson:gson:2.8.9'
 
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'

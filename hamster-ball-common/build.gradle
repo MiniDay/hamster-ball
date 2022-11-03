@@ -3,7 +3,7 @@ setArchivesBaseName("HamsterBall-Common")
 dependencies {
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     //noinspection GradlePackageUpdate
-    compileOnly 'com.google.code.gson:gson:2.8.0'
+    compileOnly 'com.google.code.gson:gson:2.8.9'
     // https://mvnrepository.com/artifact/io.netty/netty-all
     compileOnly 'io.netty:netty-all:4.1.82.Final'
 

@@ -19,6 +19,7 @@ import cn.hamster3.mc.plugin.core.common.constant.CoreConstantObjects;
 import cn.hamster3.mc.plugin.core.common.data.DisplayMessage;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -638,7 +639,7 @@ public abstract class BallAPI {
             statement.setString(1, uuid.toString());
             ResultSet set = statement.executeQuery();
             while (set.next()) {
-                JsonObject object = CoreConstantObjects.JSON_PARSER.parse(set.getString("msg")).getAsJsonObject();
+                JsonObject object = JsonParser.parseString(set.getString("msg")).getAsJsonObject();
                 list.add(new DisplayMessage().fromJson(object));
             }
             statement.close();

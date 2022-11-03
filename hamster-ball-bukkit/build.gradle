@@ -8,7 +8,7 @@ dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
 
     compileOnly "cn.hamster3.mc.plugin.core:bukkit:${hamster_core_version}"
-    apiShade("me.clip:placeholderapi:2.11.2") { transitive = false }
+    compileOnly("me.clip:placeholderapi:2.11.2") { transitive = false }
 }
 
 processResources {
