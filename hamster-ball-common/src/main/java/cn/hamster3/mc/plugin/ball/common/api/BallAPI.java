@@ -171,7 +171,8 @@ public abstract class BallAPI {
                         ") CHARSET utf8mb4;");
                 statement.execute("CREATE TABLE IF NOT EXISTS " + BallCommonConstants.SQL.CACHED_MESSAGE_TABLE + "(" +
                         "`uuid` CHAR(36) NOT NULL," +
-                        "`message` MEDIUMTEXT NOT NULL" +
+                        "`message` TEXT NOT NULL," +
+                        "CONSTRAINT `fk_uuid` FOREIGN KEY (`uuid`) REFERENCES " + BallCommonConstants.SQL.PLAYER_INFO_TABLE + "(`uuid`) ON DELETE CASCADE ON UPDATE CASCADE" +
                         ") CHARSET utf8mb4;");
                 statement.close();
             }
