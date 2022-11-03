@@ -170,9 +170,7 @@ public abstract class BallAPI {
                         ") CHARSET utf8mb4;");
                 statement.execute("CREATE TABLE IF NOT EXISTS `hamster_ball_cached_message`(" +
                         "`uuid` CHAR(36) NOT NULL," +
-                        "`message` TEXT NOT NULL," +
-                        "CONSTRAINT `fk_uuid_ball` FOREIGN KEY (`uuid`) REFERENCES `hamster_ball_player_info`(`uuid`) " +
-                        "ON DELETE CASCADE ON UPDATE CASCADE" +
+                        "`message` TEXT NOT NULL" +
                         ") CHARSET utf8mb4;");
                 statement.close();
             }
