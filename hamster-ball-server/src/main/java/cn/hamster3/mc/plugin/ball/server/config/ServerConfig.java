@@ -26,9 +26,10 @@ public final class ServerConfig {
     @SuppressWarnings("unchecked")
     public static void init() throws IOException {
         File configFile = new File("config.yml");
-        InputStream stream = Files.newInputStream(configFile.toPath());
-        Map<String, Object> map = new Yaml().load(stream);
-        stream.close();
+        Map<String, Object> map;
+        try (InputStream stream = Files.newInputStream(configFile.toPath())) {
+            map = new Yaml().load(stream);
+        }
 
         host = (String) map.get("host");
         port = (int) map.get("port");
