@@ -3,6 +3,7 @@ package cn.hamster3.mc.plugin.core.bungee;
 import cn.hamster3.mc.plugin.ball.common.api.BallAPI;
 import cn.hamster3.mc.plugin.ball.common.entity.BallServerInfo;
 import cn.hamster3.mc.plugin.ball.common.entity.BallServerType;
+import cn.hamster3.mc.plugin.ball.common.event.server.ServerOnlineEvent;
 import cn.hamster3.mc.plugin.core.bungee.api.BallBungeeCordAPI;
 import cn.hamster3.mc.plugin.core.bungee.listener.BallBungeeCordListener;
 import cn.hamster3.mc.plugin.core.bungee.util.BallBungeeCordUtils;
@@ -45,6 +46,11 @@ public class HamsterBallPlugin extends Plugin {
             ProxyServer.getInstance().getServers().put(serverInfo.getId(), BallBungeeCordUtils.getServerInfo(serverInfo));
             HamsterBallPlugin.getInstance().getLogger().info("已添加子服 " + serverInfo.getId() + " 的接入点配置.");
         }
+        BallAPI.getInstance().sendBallMessage(
+                BallAPI.BALL_CHANNEL,
+                ServerOnlineEvent.ACTION,
+                new ServerOnlineEvent(BallAPI.getInstance().getLocalServerInfo())
+        );
         logger.info("HamsterBall 已启动.");
     }
 

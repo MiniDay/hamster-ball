@@ -220,8 +220,6 @@ public abstract class BallAPI {
             }
 
         }
-
-        sendBallMessage(new BallMessageInfo(BALL_CHANNEL, ServerOnlineEvent.ACTION, new ServerOnlineEvent(localInfo)), true);
     }
 
     protected void connect() throws InterruptedException {

@@ -3,6 +3,8 @@ package cn.hamster3.mc.plugin.ball.bukkit;
 import cn.hamster3.mc.plugin.ball.bukkit.api.BallBukkitAPI;
 import cn.hamster3.mc.plugin.ball.bukkit.hook.PlaceholderHook;
 import cn.hamster3.mc.plugin.ball.bukkit.listener.BallBukkitListener;
+import cn.hamster3.mc.plugin.ball.common.api.BallAPI;
+import cn.hamster3.mc.plugin.ball.common.event.server.ServerOnlineEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -39,6 +41,11 @@ public class HamsterBallPlugin extends JavaPlugin {
         Logger logger = getLogger();
         Bukkit.getPluginManager().registerEvents(BallBukkitListener.INSTANCE, this);
         logger.info("已注册 BallBukkitListener.");
+        BallAPI.getInstance().sendBallMessage(
+                BallAPI.BALL_CHANNEL,
+                ServerOnlineEvent.ACTION,
+                new ServerOnlineEvent(BallAPI.getInstance().getLocalServerInfo())
+        );
         logger.info("HamsterBall 已启动.");
         sync(() -> {
             if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
