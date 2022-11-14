@@ -21,7 +21,6 @@ public class BallServerChannelHandler extends SimpleChannelInboundHandler<String
     @Override
     protected void channelRead0(ChannelHandlerContext context, String message) {
         if ("ping".equals(message)) {
-            LOGGER.info("从服务器 {} 上收到一条 ping 消息.", context.channel().remoteAddress());
             context.writeAndFlush("pong");
             return;
         }
